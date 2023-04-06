@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  postgresql:
+    image: bitnami/postgresql:15.2.0
+    restart: unless-stopped
+    volumes:
+      - ./data/postgresql:/bitnami/postgresql
+    ports:
+      - 8432:5432
+    environment:
+      - POSTGRESQL_PASSWORD=test123
+    networks:
+      - mylearning
+
+  pgadmin:
+    image: dpage/pgadmin4:6.21
+    restart: unless-stopped
+    volumes:
+      - ./data/pgadmin/servers.json:/pgadmin4/servers.json
+    ports:
+      - 8050:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=hello@digital4you.ch
+      - PGADMIN_DEFAULT_PASSWORD=d4y
+    networks:
+      - mylearning
+
+  redis:
+    image: redis/redis-stack-server:latest
+    restart: unless-stopped
+    ports:
+      - 8379:6379
+    networks:
+      - mylearning
+
+networks:
+  mylearning:
+    driver: bridge

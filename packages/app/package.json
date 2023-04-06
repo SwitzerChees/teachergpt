@@ -1,0 +1,18 @@
+{
+  "name": "@mylearning/app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend for a learning platform",
+  "scripts": {
+    "start": "node .output/server/index.mjs",
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "yarn nuxi typecheck"
+  },
+  "devDependencies": {
+    "nuxt": "^3.3.3"
+  }
+}

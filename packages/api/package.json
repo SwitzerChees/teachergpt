@@ -1,0 +1,31 @@
+{
+  "name": "@mylearning/api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend for a learning platform",
+  "scripts": {
+    "dev": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "@mylearning/common": "1.0.0",
+    "@strapi/strapi": "4.9.0",
+    "@strapi/plugin-users-permissions": "4.9.0",
+    "@strapi/plugin-i18n": "4.9.0",
+    "pg": "8.8.0"
+  },
+  "author": {
+    "name": "SwitzerChees"
+  },
+  "strapi": {
+    "uuid": "deb16467-da23-4df7-a4e9-946fe54bd317",
+    "telemetryDisabled": true
+  },
+  "engines": {
+    "node": ">=14.19.1 <=18.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
