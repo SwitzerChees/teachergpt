@@ -35,4 +35,12 @@ export default defineNuxtConfig({
       maxAge: THIRTY_DAYS,
     },
   },
+  imports: {
+    dirs: [
+      // Scan top-level composables
+      'composables',
+      // Scan top-level stores
+      'stores',
+    ],
+  },
 })

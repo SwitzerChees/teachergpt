@@ -19,35 +19,15 @@ import CourseMenuItem from './CourseMenuItem.vue';
 
 <script setup lang="ts">
   import { Course } from '@mylearning/common'
+  const { getSafeAPIResponse } = useAPI()
 
   const courses = ref<Course[]>([])
 
-  onMounted(() => {
-    courses.value = [
-      {
-        id: 1,
-        name: 'Parallele und verteilte Systeme',
-        lessons: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        locale: 'de',
-      },
-      {
-        id: 2,
-        name: 'Künstliche Intelligenz',
-        lessons: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        locale: 'de',
-      },
-      {
-        id: 3,
-        name: 'Internet Dienste',
-        lessons: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        locale: 'de',
-      },
-    ]
+  onMounted(async () => {
+    const { find } = useStrapi()
+    const request = find('courses')
+    const { ok, result } = await getSafeAPIResponse<Course[]>(request)
+    if (!ok) return
+    courses.value = result
   })
 </script>

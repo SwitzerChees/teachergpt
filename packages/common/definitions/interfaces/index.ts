@@ -1,1 +1,5 @@
 export * from './collection-types'
+export * from './APIOptions'
+export * from './APIResponse'
+export * from './TransformerOptions'
+export * from './Notification'

@@ -1,1 +1,1 @@
-export * from './MyType'
+export * from './Severity'
