@@ -1,0 +1,47 @@
+@import './_theme.light.css' (prefers-color-scheme: light);
+@import './_theme.dark.css' (prefers-color-scheme: dark);
+@import './styles.css';
+
+:root {
+  --font-family: 'Open Sans', Arial, sans-serif;
+}
+
+html[data-theme='light'] {
+  /* light theme specific css */
+  --primary-color: hsl(348, 88%, 39%);
+  --primary-color-light: hsl(344, 96%, 46%, 0.2);
+  --primary-color-dark: hsl(352, 80%, 32%);
+  --primary-color-darker: hsl(355, 73%, 27%);
+  --primary-color-text: #ffffff;
+  --primary-box-shadow: hsl(348, 88%, 60%);
+  --highlight-bg: #eff6ff;
+  --highlight-bg-focus: rgba(59, 130, 246, 0.24);
+  --background-color: #ffffff;
+  --divider-background: var(--background-color);
+  color-scheme: light;
+  background: var(--background-color);
+
+  --scrollbar-thumb: #888;
+  --scrollbar-thumb-hover: #555;
+}
+
+html[data-theme='dark'] {
+  /* dark theme specific css */
+  --primary-color: hsl(343, 93%, 50%);
+  --primary-color-light: hsl(343, 93%, 50%, 0.5);
+  --primary-color-dark: hsl(343, 93%, 45%);
+  --primary-color-darker: hsl(343, 93%, 40%);
+  --primary-color-text: #1c2127;
+  --primary-box-shadow: hsl(343, 93%, 50%, 0.7);
+  --highlight-bg: rgba(147, 197, 253, 0.16);
+  --highlight-bg-focus: rgba(147, 197, 253, 0.24);
+  --background-color: rgb(15 23 42);
+  --background-color-secondary: #1e293b;
+  --divider-background: var(--background-color-secondary);
+  --divider-line-color: #ffffff;
+  color-scheme: dark;
+  background: var(--background-color);
+
+  --scrollbar-thumb: #0b213f;
+  --scrollbar-thumb-hover: #555;
+}

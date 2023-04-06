@@ -13,6 +13,18 @@
     "typecheck": "yarn nuxi typecheck"
   },
   "devDependencies": {
-    "nuxt": "^3.3.3"
+    "@nuxtjs/strapi": "^1.9.0",
+    "@nuxtjs/tailwindcss": "^6.6.5",
+    "@nuxtjs/color-mode": "^3.2.0",
+    "@tailwindcss/container-queries": "^0.1.1",
+    "nuxt": "^3.3.3",
+    "nuxt-icon": "^0.3.3"
+  },
+  "dependencies": {
+    "@mylearning/common": "1.0.0",
+    "@pinia/nuxt": "^0.4.7",
+    "pinia": "^2.0.33",
+    "primeicons": "^6.0.1",
+    "primevue": "^3.26.1"
   }
 }

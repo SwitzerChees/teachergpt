@@ -1,0 +1,156 @@
+h1 {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+h2 {
+  font-weight: 300;
+  font-size: 1.125rem;
+}
+
+.logo {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.title {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 32px;
+  text-decoration: none;
+}
+
+.subtitle {
+  font-weight: 400;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.heading {
+  font-weight: 300;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.label {
+  font-weight: 300;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.error-label {
+  font-weight: 300;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.link {
+  font-weight: 300;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.mobile-menu-nav {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 34px;
+  text-decoration: none;
+}
+
+.mobile-menu-nav-active {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 34px;
+  text-decoration: none;
+}
+
+.mobile-nav {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.mobile-nav-active {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.montserrat {
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+.p-breadcrumb {
+  padding: 0.407rem;
+}
+
+.p-button.p-button-xs {
+  font-size: 0.88rem;
+  padding: 0.25rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.p-button.p-splitbutton-menubutton {
+  height: 2rem;
+}
+
+.p-card-body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.p-card-footer {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+@media (prefers-color-scheme: dark) {
+  .p-card.p-highlight {
+    background: var(--highlight-bg);
+  }
+}
+.p-dialog-mask.p-component-overlay {
+  animation: none;
+}
+
+.p-fileupload {
+  width: 100%;
+}
+
+.p-fileupload.p-fileupload-advanced.p-component {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.p-fileupload-content {
+  overflow: hidden;
+}
+
+/* width */
+.custom-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+/* Handle */
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}

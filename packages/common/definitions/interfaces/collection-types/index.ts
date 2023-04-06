@@ -1,2 +1,5 @@
 export * from './StrapiObject'
 export * from './User'
+export * from './Course'
+export * from './Lesson'
+export * from './Question'
