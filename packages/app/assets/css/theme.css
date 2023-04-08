@@ -1,6 +1,7 @@
 @import './_theme.light.css' (prefers-color-scheme: light);
 @import './_theme.dark.css' (prefers-color-scheme: dark);
 @import './styles.css';
+@import 'highlight.js/styles/monokai.css';
 
 :root {
   --font-family: 'Open Sans', Arial, sans-serif;

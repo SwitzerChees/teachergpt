@@ -22,14 +22,9 @@
 <script setup lang="ts">
   import { Lesson } from '@mylearning/common'
   import { defineProps } from 'vue'
+  import { formatDate } from '~/utils'
   const props = defineProps<{ lesson: Lesson }>()
   const route = useRoute()
-
-  const formatDate = (date: Date | undefined) => {
-    if (!date) return ''
-    const d = new Date(date)
-    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`
-  }
 
   const isActive = computed(() => route.path.startsWith(toLink()))
   const toLink = () => `/course/${props.lesson.course.id}/lesson/${props.lesson.id}`

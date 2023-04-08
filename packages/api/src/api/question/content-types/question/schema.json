@@ -32,9 +32,21 @@
       "type": "customField",
       "options": {
         "output": "Markdown",
-        "preset": "light"
+        "preset": "rich"
       },
       "customField": "plugin::ckeditor.CKEditor"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "questions"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["open", "done"],
+      "default": "open",
+      "required": true
     }
   }
 }

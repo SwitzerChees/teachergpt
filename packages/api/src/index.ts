@@ -1,3 +1,5 @@
+import { connectBull } from './jobs/bull'
+
 export default {
   /**
    * An asynchronous register function that runs before
@@ -5,7 +7,11 @@ export default {
    *
    * This gives you an opportunity to extend code.
    */
-  register(/* { strapi } */) {},
+  async register({ strapi }) {
+    const { role } = strapi.config.server
+    strapi.log.info(`Server Role: ${role}`)
+    await connectBull(strapi)
+  },
 
   /**
    * An asynchronous bootstrap function that runs before

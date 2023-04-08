@@ -29,18 +29,30 @@ export const useSidebarsStore = defineStore('sidebars', () => {
   }
 
   const selectCourse = () => {
-    if (!route.params.courseId) return
+    if (!route.params.courseId) {
+      selectedCourse.value = undefined
+      return
+    }
     const courseId = Number(route.params.courseId)
     const course = courses.value.find((c) => c.id === courseId)
-    if (!course) return
+    if (!course) {
+      selectedCourse.value = undefined
+      return
+    }
     selectedCourse.value = course
   }
 
   const selectLesson = () => {
-    if (!route.params.lessonId) return
+    if (!route.params.lessonId) {
+      selectedLesson.value = undefined
+      return
+    }
     const lessonId = Number(route.params.lessonId)
     const lesson = lessons.value.find((l) => l.id === lessonId)
-    if (!lesson) return
+    if (!lesson) {
+      selectedLesson.value = undefined
+      return
+    }
     selectedLesson.value = lesson
   }
 

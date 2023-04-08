@@ -1,4 +1,4 @@
-import { StrapiObject } from '.'
+import { Question, StrapiObject } from '.'
 
 interface User extends StrapiObject {
   username: string
@@ -13,9 +13,7 @@ interface User extends StrapiObject {
   emailTokenCreatedAt?: Date
   smsToken?: string
   smsTokenCreatedAt?: Date
-  firstName?: string
-  lastName?: string
-  phone?: string
+  question: Question[]
 }
 
 export { User }

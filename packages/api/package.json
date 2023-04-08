@@ -17,6 +17,8 @@
     "@strapi/plugin-i18n": "4.9.0",
     "@strapi/plugin-users-permissions": "4.9.0",
     "@strapi/strapi": "4.9.0",
+    "bullmq": "^3.10.4",
+    "openai": "^3.2.1",
     "pg": "8.8.0"
   },
   "author": {
