@@ -25,14 +25,19 @@
       "target": "api::lesson.lesson",
       "mappedBy": "course"
     },
-    "summary": {
-      "type": "text"
-    },
     "questions": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::question.question",
       "mappedBy": "course"
+    },
+    "summary": {
+      "type": "customField",
+      "options": {
+        "output": "Markdown",
+        "preset": "light"
+      },
+      "customField": "plugin::ckeditor.CKEditor"
     }
   }
 }

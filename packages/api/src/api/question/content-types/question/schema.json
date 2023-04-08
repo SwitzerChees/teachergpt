@@ -16,9 +16,6 @@
       "type": "text",
       "required": true
     },
-    "answer": {
-      "type": "text"
-    },
     "course": {
       "type": "relation",
       "relation": "manyToOne",
@@ -30,6 +27,14 @@
       "relation": "manyToOne",
       "target": "api::lesson.lesson",
       "inversedBy": "questions"
+    },
+    "answer": {
+      "type": "customField",
+      "options": {
+        "output": "Markdown",
+        "preset": "light"
+      },
+      "customField": "plugin::ckeditor.CKEditor"
     }
   }
 }
