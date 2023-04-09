@@ -1,4 +1,4 @@
-import { APIOptions, APIResponse, Severities } from '@mylearning/common/definitions'
+import { APIOptions, APIResponse, Severities } from '@teachergpt/common/definitions'
 import { HttpStatusCode } from 'axios'
 
 export const useAPI = () => {

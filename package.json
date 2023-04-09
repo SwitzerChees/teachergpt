@@ -1,5 +1,5 @@
 {
-  "name": "mylearning",
+  "name": "teachergpt",
   "license": "MIT",
   "private": true,
   "workspaces": [
@@ -7,12 +7,12 @@
   ],
   "scripts": {
     "dev": "concurrently \"yarn dev:api\" \"yarn dev:app\" \"yarn dev:common\"",
-    "dev:app": "yarn workspace @mylearning/app dev",
-    "dev:api": "yarn workspace @mylearning/api dev",
+    "dev:app": "yarn workspace @teachergpt/app dev",
+    "dev:api": "yarn workspace @teachergpt/api dev",
     "dev:common": "tsc-watch -b ./packages/common/tsconfig.json",
     "prettify": "prettier --write \"**/*.{js,ts,html,css,json,md,vue}\"",
     "lint": "eslint --ext .js,.ts,.vue --fix packages/**",
-    "typecheck:app": "yarn workspace @mylearning/app typecheck",
+    "typecheck:app": "yarn workspace @teachergpt/app typecheck",
     "prepare": "husky install"
   },
   "devDependencies": {

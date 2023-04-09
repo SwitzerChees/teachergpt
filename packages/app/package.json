@@ -1,5 +1,5 @@
 {
-  "name": "@mylearning/app",
+  "name": "@teachergpt/app",
   "version": "1.0.0",
   "private": true,
   "description": "Frontend for a learning platform",
@@ -22,7 +22,7 @@
     "nuxt-icon": "^0.3.3"
   },
   "dependencies": {
-    "@mylearning/common": "1.0.0",
+    "@teachergpt/common": "1.0.0",
     "@pinia/nuxt": "^0.4.7",
     "pinia": "^2.0.33",
     "primeicons": "^6.0.1",

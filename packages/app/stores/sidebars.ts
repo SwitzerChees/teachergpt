@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import { Course, Lesson, ProcessingStates } from '@mylearning/common/definitions'
+import { Course, Lesson, ProcessingStates } from '@teachergpt/common/definitions'
 
 const courses = ref<Course[]>([])
 const selectedCourse = ref<Course>()

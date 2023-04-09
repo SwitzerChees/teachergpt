@@ -10,7 +10,7 @@ services:
     environment:
       - POSTGRESQL_PASSWORD=test123
     networks:
-      - mylearning
+      - teachergpt
 
   pgadmin:
     image: dpage/pgadmin4:6.21
@@ -23,7 +23,7 @@ services:
       - PGADMIN_DEFAULT_EMAIL=hello@digital4you.ch
       - PGADMIN_DEFAULT_PASSWORD=d4y
     networks:
-      - mylearning
+      - teachergpt
 
   redis:
     image: redis/redis-stack-server:latest
@@ -31,8 +31,8 @@ services:
     ports:
       - 8379:6379
     networks:
-      - mylearning
+      - teachergpt
 
 networks:
-  mylearning:
+  teachergpt:
     driver: bridge

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { TransformerOptions } from '@mylearning/common/definitions'
+import { TransformerOptions } from '@teachergpt/common/definitions'
 
 const removeObjectKey = (object: any, key: string) => ({
   id: object.id,

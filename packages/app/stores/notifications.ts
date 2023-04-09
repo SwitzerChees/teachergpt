@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import { Notification } from '@mylearning/common/definitions'
+import { Notification } from '@teachergpt/common/definitions'
 
 export const useNotificationsStore = defineStore('notifications', () => {
   const { defaultLife = 3000, defaultShowAgainSeconds = 10 } = {}

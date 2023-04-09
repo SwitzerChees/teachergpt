@@ -8,7 +8,7 @@
     "paths": {
       "~~": ["."],
       "~~/*": ["./*"],
-      "@mylearning/*": ["@mylearning/*"]
+      "@teachergpt/*": ["@teachergpt/*"]
     }
   },
   "references": [{ "path": "../common" }],

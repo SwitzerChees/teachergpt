@@ -31,7 +31,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { Question } from '@mylearning/common'
+  import { Question } from '@teachergpt/common'
   import { formatDate } from '~/utils'
 
   defineProps<{ question: Question }>()

@@ -1,5 +1,5 @@
 {
-  "name": "@mylearning/api",
+  "name": "@teachergpt/api",
   "version": "1.0.0",
   "private": true,
   "description": "Backend for a learning platform",
@@ -13,7 +13,7 @@
     "@_sh/strapi-plugin-ckeditor": "^2.0.4",
     "@ckeditor/ckeditor5-markdown-gfm": "^37.0.1",
     "@ckeditor/strapi-plugin-ckeditor": "^0.0.7",
-    "@mylearning/common": "1.0.0",
+    "@teachergpt/common": "1.0.0",
     "@strapi/plugin-i18n": "4.9.0",
     "@strapi/plugin-users-permissions": "4.9.0",
     "@strapi/strapi": "4.9.0",

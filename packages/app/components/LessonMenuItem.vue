@@ -20,7 +20,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { Lesson } from '@mylearning/common'
+  import { Lesson } from '@teachergpt/common'
   import { defineProps } from 'vue'
   import { formatDate } from '~/utils'
   const props = defineProps<{ lesson: Lesson }>()

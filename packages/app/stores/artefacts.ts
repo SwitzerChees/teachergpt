@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia'
 
-import { Artefact, ProcessingStates } from '@mylearning/common/definitions'
+import { Artefact, ProcessingStates } from '@teachergpt/common/definitions'
 
 const artefacts = ref<Artefact[]>([])
 

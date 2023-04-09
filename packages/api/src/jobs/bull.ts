@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { Queue, Worker, Job, QueueOptions } from 'bullmq'
-import { Artefact, BullStrapi, Course, Lesson, Question, ServerRoles } from '@mylearning/common'
+import { Artefact, BullStrapi, Course, Lesson, Question, ServerRoles } from '@teachergpt/common'
 import { completePrompt, getTextFromPDF } from '.'
 
 const connectBull = (strapi: BullStrapi) => {

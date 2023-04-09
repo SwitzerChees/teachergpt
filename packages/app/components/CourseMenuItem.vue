@@ -10,7 +10,7 @@
   </NuxtLink>
 </template>
 <script setup lang="ts">
-  import { Course } from '@mylearning/common'
+  import { Course } from '@teachergpt/common'
   import { defineProps } from 'vue'
   const props = defineProps<{ course: Course }>()
   const route = useRoute()
