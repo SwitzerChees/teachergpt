@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-import { Course, Lesson } from '@mylearning/common/definitions'
+import { Course, Lesson, ProcessingStates } from '@mylearning/common/definitions'
 
 const courses = ref<Course[]>([])
 const selectedCourse = ref<Course>()
@@ -13,7 +13,7 @@ export const useSidebarsStore = defineStore('sidebars', () => {
   const route = useRoute()
 
   const fetchCourses = async () => {
-    const request = find('courses')
+    const request = find('courses', { filters: { status: { $ne: ProcessingStates.Archived } } })
     const { ok, result } = await getSafeAPIResponse<Course[]>(request)
     if (!ok) return
     courses.value = result
@@ -21,7 +21,7 @@ export const useSidebarsStore = defineStore('sidebars', () => {
   }
 
   const fetchLessons = async (course: Course) => {
-    const request = find('lessons', { filters: { course: course.id }, populate: ['course'] })
+    const request = find('lessons', { filters: { course: course.id, status: { $ne: ProcessingStates.Archived } }, populate: ['course'] })
     const { ok, result } = await getSafeAPIResponse<Lesson[]>(request)
     if (!ok) return
     lessons.value = result

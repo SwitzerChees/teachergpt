@@ -1,3 +1,4 @@
+import { ProcessingStatus } from '../../enums'
 import { Artefact, Lesson, StrapiObject, User } from '.'
 
 interface Course extends StrapiObject {
@@ -7,6 +8,7 @@ interface Course extends StrapiObject {
   lessons: Lesson[]
   artefacts: Artefact[]
   user: User
+  status: ProcessingStatus
 }
 
 export { Course }

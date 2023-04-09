@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia'
 
-import { Artefact } from '@mylearning/common/definitions'
+import { Artefact, ProcessingStates } from '@mylearning/common/definitions'
 
 const artefacts = ref<Artefact[]>([])
 
@@ -13,6 +13,7 @@ export const useArtefactsStore = defineStore('artefacts', () => {
       filters: {
         lesson: selectedLesson.value?.id,
         course: selectedCourse.value?.id,
+        status: { $ne: ProcessingStates.Archived },
       },
       populate: {
         file: true,

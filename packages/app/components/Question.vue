@@ -26,7 +26,7 @@
       <Skeleton width="10rem"></Skeleton>
     </div>
     <div v-else>
-      <Markdown :source="question.answer" class="markdown-format" />
+      <Markdown :source="question.answer || ''" class="markdown-format" />
     </div>
   </div>
 </template>

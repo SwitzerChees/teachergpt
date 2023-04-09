@@ -35,7 +35,7 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": ["open", "done"],
+      "enum": ["open", "done", "archived"],
       "default": "open",
       "required": true
     }

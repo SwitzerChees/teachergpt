@@ -44,6 +44,12 @@
       "relation": "oneToMany",
       "target": "api::artefact.artefact",
       "mappedBy": "course"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["open", "done", "archived"],
+      "default": "open",
+      "required": true
     }
   }
 }

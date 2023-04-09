@@ -1,3 +1,4 @@
+import { ProcessingStatus } from '../../enums'
 import { Course, Lesson, StrapiObject, User } from '.'
 
 interface Question extends StrapiObject {
@@ -6,7 +7,7 @@ interface Question extends StrapiObject {
   course: Course
   lesson?: Lesson
   user: User
-  status: 'open' | 'done'
+  status: ProcessingStatus
 }
 
 export { Question }

@@ -44,6 +44,12 @@
       "relation": "oneToMany",
       "target": "api::artefact.artefact",
       "mappedBy": "lesson"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["open", "done", "archived"],
+      "default": "open",
+      "required": true
     }
   }
 }

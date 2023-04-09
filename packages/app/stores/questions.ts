@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from 'pinia'
 
-import { Question } from '@mylearning/common/definitions'
+import { ProcessingStates, Question } from '@mylearning/common/definitions'
 
 const questions = ref<Question[]>([])
 
@@ -13,6 +13,7 @@ export const useQuestionsStore = defineStore('questions', () => {
       filters: {
         lesson: selectedLesson.value?.id,
         course: selectedCourse.value?.id,
+        status: { $ne: ProcessingStates.Archived },
       },
       populate: {
         course: {
