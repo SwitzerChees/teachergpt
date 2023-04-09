@@ -26,7 +26,7 @@
       <Skeleton width="10rem"></Skeleton>
     </div>
     <div v-else>
-      <Markdown :source="question.answer" />
+      <Markdown :source="question.answer" class="markdown-format" />
     </div>
   </div>
 </template>
@@ -36,3 +36,10 @@
 
   defineProps<{ question: Question }>()
 </script>
+
+<style>
+  .markdown-format li {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+</style>

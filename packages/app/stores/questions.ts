@@ -22,6 +22,7 @@ export const useQuestionsStore = defineStore('questions', () => {
           fields: ['id', 'title'],
         },
       },
+      sort: ['createdAt:desc'],
     })
     const { ok, result } = await getSafeAPIResponse<Question[]>(request)
     if (!ok) return
@@ -38,7 +39,6 @@ export const useQuestionsStore = defineStore('questions', () => {
         lesson: selectedLesson.value?.id,
         course: selectedCourse.value?.id,
       },
-      sort: 'createdAt:desc',
     })
     const { ok, result } = await getSafeAPIResponse<Question[]>(request)
     if (!ok) return

@@ -5,14 +5,20 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration)
 
 const systemMessage: ChatCompletionRequestMessage[] = [
-  { role: 'system', content: "Hi! I'm a bot. I'm here to help you with your questions." },
+  {
+    role: 'system',
+    content:
+      'Du bist TeacherGPT. Ein superstarkes Sprachmodell, das Schülern helfen soll, Antworten auf ihre Fragen zu finden. Du antwortest immer mit Markdown, um die Antwort ordnungsgemäß formatieren zu können.',
+  },
 ]
+
+const markdownSystemMessage = ', formatiere die Antwort bitte mit Markdown und verwende Aufzählungen.'
 
 export const completePrompt = async (prompt: string) => {
   try {
     const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages: [...systemMessage, { role: 'user', content: prompt }],
+      model: 'gpt-4-0314',
+      messages: [...systemMessage, { role: 'user', content: `${prompt}${markdownSystemMessage}` }],
     })
     const completionText = completion.data.choices[0].message.content
     return completionText
