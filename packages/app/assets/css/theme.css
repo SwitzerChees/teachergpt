@@ -27,13 +27,13 @@ html[data-theme='light'] {
 }
 
 html[data-theme='dark'] {
-  /* dark theme specific css */
-  --primary-color: hsl(343, 93%, 50%);
-  --primary-color-light: hsl(343, 93%, 50%, 0.5);
-  --primary-color-dark: hsl(343, 93%, 45%);
-  --primary-color-darker: hsl(343, 93%, 40%);
+  /* blue theme specific css */
+  --primary-color: hsl(209, 100%, 50%);
+  --primary-color-light: hsl(209, 100%, 50%, 0.5);
+  --primary-color-dark: hsl(209, 100%, 45%);
+  --primary-color-darker: hsl(209, 100%, 40%);
   --primary-color-text: #1c2127;
-  --primary-box-shadow: hsl(343, 93%, 50%, 0.7);
+  --primary-box-shadow: hsl(209, 100%, 50%, 0.7);
   --highlight-bg: rgba(147, 197, 253, 0.16);
   --highlight-bg-focus: rgba(147, 197, 253, 0.24);
   --background-color: rgb(15 23 42);
