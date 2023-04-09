@@ -8,6 +8,7 @@
       </template>
     </Column>
     <Column field="file.name" header="Name" :sortable="true"></Column>
+    <Column field="lesson.title" header="Lektion" :sortable="true"></Column>
     <Column :header-style="{ width: '200px ' }" field="updatedAt" header="Erstellt am" :style="{ width: '200px' }" :sortable="true">
       <template #body="{ data: { updatedAt } }">
         {{ formatDate(updatedAt) }}

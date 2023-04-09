@@ -16,6 +16,9 @@ export const useArtefactsStore = defineStore('artefacts', () => {
       },
       populate: {
         file: true,
+        lesson: {
+          fields: ['id', 'title'],
+        },
       },
       sort: ['createdAt:desc'],
     })
