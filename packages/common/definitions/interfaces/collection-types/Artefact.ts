@@ -5,6 +5,7 @@ interface Artefact extends StrapiObject {
   transcript?: string
   course: Course
   lesson: Lesson
+  status: 'open' | 'done'
 }
 
 export { Artefact }

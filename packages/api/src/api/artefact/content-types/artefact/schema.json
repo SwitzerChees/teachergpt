@@ -32,6 +32,12 @@
       "relation": "manyToOne",
       "target": "api::lesson.lesson",
       "inversedBy": "artefacts"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["open", "done"],
+      "default": "open",
+      "required": true
     }
   }
 }
