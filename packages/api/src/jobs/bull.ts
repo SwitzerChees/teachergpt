@@ -69,9 +69,9 @@ const processQuestions = (strapi: BullStrapi) => {
     })) as Question[]
     for (const openQuestion of openQuestions) {
       strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question}`)
-      const artefacts = openQuestion.course.artefacts.filter((artefact) => artefact.id === 4)
-      const transcript = artefacts.map((artefact) => artefact.transcript).join(' ')
-      const prompt = questionPrompt(transcript, openQuestion.question)
+      // const artefacts = openQuestion.course.artefacts.filter((artefact) => artefact.id === 4)
+      // const transcript = artefacts.map((artefact) => artefact.transcript).join(' ')
+      const prompt = questionPrompt('', openQuestion.question)
       const completionText = await completePrompt(prompt)
       if (!completionText) continue
       await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
