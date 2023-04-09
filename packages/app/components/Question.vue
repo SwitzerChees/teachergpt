@@ -19,7 +19,7 @@
     <span class="font-bold">Antwort</span>
     <div v-if="question.status === 'open'" class="flex flex-col gap-2">
       <span class="text-sm text-orange-400"
-        >Gib mir einen moment ich durchsuche die Kursmaterialien für dich für eine passende Antwort...</span
+        >Gib mir einen moment ich durchsuche die Kursmaterialien für dich um eine passende Antwort zu liefern...</span
       >
       <Skeleton></Skeleton>
       <Skeleton width="20rem"></Skeleton>

@@ -59,6 +59,8 @@ export const useQuestionsStore = defineStore('questions', () => {
     })
     const { ok, result } = await getSafeAPIResponse<Question>(request)
     if (!ok) return
+    if (selectedCourse.value) result.course = selectedCourse.value
+    if (selectedLesson.value) result.lesson = selectedLesson.value
     questions.value.unshift(result)
   }
 
