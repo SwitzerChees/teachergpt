@@ -56,6 +56,6 @@ export const getEmbeddings = async (text: string) => {
     return response.data.data[0].embedding
   } catch (error) {
     strapi.log.error(error)
-    return ''
+    return []
   }
 }

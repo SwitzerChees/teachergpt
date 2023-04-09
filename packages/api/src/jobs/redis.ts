@@ -21,50 +21,48 @@ const connectRedis = async (strapi: BullStrapi) => {
   clientSubscribe.on('error', onRedisError)
   await clientSubscribe.connect()
   strapi.redisSubscribe = clientSubscribe
+  let indexExists = true
   try {
-    const existingIndexes = await strapi.redis.ft.info('idx:artefacts')
-    if (existingIndexes) {
-      await strapi.redis.ft.dropIndex('idx:artefacts')
-    }
+    await strapi.redis.ft.info('idx:artefacts')
+    // await strapi.redis.ft.dropIndex('idx:artefacts')
   } catch (error) {
+    indexExists = false
     strapi.log.error(error)
   }
-  await strapi.redis.ft.create(
-    'idx:artefacts',
-    {
-      '$.transcript': {
-        type: SchemaFieldTypes.TEXT,
+
+  if (!indexExists) {
+    await strapi.redis.ft.create(
+      'idx:artefacts',
+      {
+        '$.courseId': {
+          type: SchemaFieldTypes.NUMERIC,
+          AS: 'courseId',
+        },
+        '$.lessonId': {
+          type: SchemaFieldTypes.NUMERIC,
+          AS: 'lessonId',
+        },
+        '$.transcript': {
+          type: SchemaFieldTypes.TEXT,
+          AS: 'transcript',
+        },
+        '$.embedding': {
+          type: SchemaFieldTypes.VECTOR,
+          ALGORITHM: VectorAlgorithms.HNSW,
+          DIM: 1536,
+          TYPE: 'FLOAT32',
+          DISTANCE_METRIC: 'L2',
+          AS: 'embedding',
+        },
       },
-      '$.embedding': {
-        type: SchemaFieldTypes.VECTOR,
-        ALGORITHM: VectorAlgorithms.HNSW,
-        DIM: 1536,
-        TYPE: 'FLOAT32',
-        DISTANCE_METRIC: 'L2',
-      },
-    },
-    {
-      ON: 'JSON',
-      PREFIX: 'embedding:',
-    }
-  )
-  // try {
-  //   const testResult = await searchVectors(strapi, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-  //   console.log(testResult)
-  // } catch (error) {
-  //   strapi.log.error(error)
-  // }
+      {
+        ON: 'JSON',
+        PREFIX: 'embedding:',
+      }
+    )
+  }
+
   strapi.log.info(`Redis Connected: ${url}`)
-}
-
-const createRedisQuery = (queryVector: number[], topK: number): string => {
-  const vectorString = queryVector.map((val) => val.toString()).join(' ')
-  return `@embedding:[(${vectorString}) TOPK ${topK}]`
-}
-
-export const searchVectors = async (strapi: BullStrapi, queryVector: number[], topK = 5) => {
-  const baseQuery = createRedisQuery(queryVector, topK)
-  return await strapi.redis.ft.search('idx:documents', baseQuery, {})
 }
 
 export { connectRedis }

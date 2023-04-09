@@ -73,13 +73,29 @@ const processQuestions = (strapi: BullStrapi) => {
             artefacts: true,
           },
         },
+        lesson: true,
       },
     })) as Question[]
     for (const openQuestion of openQuestions) {
       strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question}`)
-      // const artefacts = openQuestion.course.artefacts.filter((artefact) => artefact.id === 4)
-      // const transcript = artefacts.map((artefact) => artefact.transcript).join(' ')
-      const prompt = questionPrompt('', openQuestion.question)
+      const question = openQuestion.question
+      const questionEmbedding = await getEmbeddings(question)
+      const primarySearchQuery = openQuestion.lesson
+        ? `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}] @lessonId:[${openQuestion.lesson.id} ${openQuestion.lesson.id}])`
+        : `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}])`
+      const searchQuery = `${primarySearchQuery}=>[KNN 5 @embedding $blob AS dist]`
+      const float32Embedding = new Float32Array(questionEmbedding)
+      const embeddingBuffer = Buffer.from(float32Embedding.buffer)
+      const result = await strapi.redis.ft.search('idx:artefacts', searchQuery, {
+        SORTBY: 'dist',
+        PARAMS: {
+          blob: embeddingBuffer,
+        },
+        DIALECT: 2,
+      })
+      const embeddingTranscripts = result.documents.map((d) => d.value.transcript) as string[]
+      const context = embeddingTranscripts.join('\n\n\n')
+      const prompt = questionPrompt(context, openQuestion.question)
       const completionText = await completePrompt(prompt)
       if (!completionText) continue
       await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
@@ -184,7 +200,12 @@ const processEmbeddings = (strapi: BullStrapi) => {
       if (!openArtefact.transcript) continue
       if (!openArtefact.embeddings) continue
       for (const embedding of openArtefact.embeddings) {
-        strapi.redis.json.set(`embedding::${embeddingCount}`, '.', embedding)
+        strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
+          transcript: embedding.transcript,
+          embedding: embedding.embedding,
+          courseId: openArtefact.course?.id,
+          lessonId: openArtefact.lesson?.id,
+        })
         embeddingCount++
       }
     }
