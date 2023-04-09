@@ -4,7 +4,7 @@
       <OverviewQuestions />
     </TabPanel>
     <TabPanel header="Zusammenfassung">
-      <Markdown :source="selectedLesson?.summary || selectedCourse?.summary || ''" class="markdown-format" />
+      <Markdown :source="summary" class="markdown-format" />
     </TabPanel>
     <TabPanel header="Material">
       <OverviewArtefacts />
@@ -24,4 +24,10 @@
   import { storeToRefs } from 'pinia'
 
   const { selectedCourse, selectedLesson } = storeToRefs(useSidebarsStore())
+
+  const summary = computed(() => {
+    if (selectedLesson.value) return selectedLesson.value.summary || ''
+    if (selectedCourse.value) return selectedCourse.value.summary || ''
+    return ''
+  })
 </script>
