@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { Queue, Worker, Job, QueueOptions } from 'bullmq'
 import { Artefact, BullStrapi, Course, Lesson, Question, ServerRoles } from '@teachergpt/common'
-import { completePrompt, getTextFromPDF } from '.'
+import { completePrompt, getTextFromPDF, getTranscript, questionPrompt } from '.'
 
 const connectBull = (strapi: BullStrapi) => {
   const {
@@ -69,9 +69,10 @@ const processQuestions = (strapi: BullStrapi) => {
     })) as Question[]
     for (const openQuestion of openQuestions) {
       strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question}`)
-      // const artefacts = openQuestion.course.artefacts
-      // const transcript = artefacts.map((artefact) => artefact.transcript).join(' ')
-      const completionText = await completePrompt(openQuestion.question)
+      const artefacts = openQuestion.course.artefacts.filter((artefact) => artefact.id === 4)
+      const transcript = artefacts.map((artefact) => artefact.transcript).join(' ')
+      const prompt = questionPrompt(transcript, openQuestion.question)
+      const completionText = await completePrompt(prompt)
       if (!completionText) continue
       await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
     }
@@ -91,12 +92,22 @@ const processArtefacts = (strapi: BullStrapi) => {
     const currentFolder = resolve(__dirname)
     for (const openArtefact of openArtefacts) {
       if (!openArtefact.file) continue
-      if (openArtefact.file.ext !== '.pdf') continue
+      let transcript = ''
       const filePath = resolve(currentFolder, '..', '..', '..', 'public', 'uploads', `${openArtefact.file.hash}${openArtefact.file.ext}`)
       strapi.log.info(`Processing Artefact: ${openArtefact.id}, ${openArtefact.file.name}`)
-      const textFromPDF = await getTextFromPDF(filePath)
-      if (!textFromPDF) continue
-      await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { transcript: textFromPDF, status: 'done' } })
+      switch (openArtefact.file.ext) {
+        case '.pdf':
+          transcript = await getTextFromPDF(filePath)
+          break
+        case '.m4a':
+          transcript = await getTranscript(filePath)
+          break
+        case '.mp3':
+          transcript = await getTranscript(filePath)
+          break
+      }
+      if (!transcript) continue
+      await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { transcript, status: 'done' } })
     }
   }
 }

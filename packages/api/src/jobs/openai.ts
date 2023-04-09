@@ -1,3 +1,4 @@
+import { existsSync, createReadStream } from 'fs'
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai'
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -12,17 +13,35 @@ const systemMessage: ChatCompletionRequestMessage[] = [
   },
 ]
 
-const markdownSystemMessage = ', formatiere die Antwort bitte mit Markdown und verwende Aufzählungen.'
-
 export const completePrompt = async (prompt: string) => {
   try {
     const completion = await openai.createChatCompletion({
       model: 'gpt-4-0314',
-      messages: [...systemMessage, { role: 'user', content: `${prompt}${markdownSystemMessage}` }],
+      messages: [...systemMessage, { role: 'user', content: prompt }],
     })
     const completionText = completion.data.choices[0].message.content
     return completionText
   } catch (error) {
     strapi.log.error(error)
+  }
+}
+
+export const getTranscript = async (path: string) => {
+  if (!existsSync(path)) return ''
+  try {
+    const openai = new OpenAIApi(configuration)
+    const audioFile = createReadStream(path)
+    const response = await openai.createTranscription(
+      audioFile, // The audio file to transcribe.
+      'whisper-1', // The model to use for transcription.
+      undefined, // The prompt to use for transcription.
+      'json', // The format of the transcription.
+      1, // Temperature
+      'de' // Language
+    )
+    return response.data.text
+  } catch (error) {
+    strapi.log.error(error)
+    return ''
   }
 }
