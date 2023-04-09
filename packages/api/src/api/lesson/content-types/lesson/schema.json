@@ -38,6 +38,12 @@
         "preset": "light"
       },
       "customField": "plugin::ckeditor.CKEditor"
+    },
+    "artefacts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::artefact.artefact",
+      "mappedBy": "lesson"
     }
   }
 }

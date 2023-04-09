@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "artefacts",
+  "info": {
+    "singularName": "artefact",
+    "pluralName": "artefacts",
+    "displayName": "Artefact",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "file": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images", "files", "videos", "audios"]
+    },
+    "transcript": {
+      "type": "text"
+    },
+    "course": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course.course",
+      "inversedBy": "artefacts"
+    },
+    "lesson": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::lesson.lesson",
+      "inversedBy": "artefacts"
+    }
+  }
+}
