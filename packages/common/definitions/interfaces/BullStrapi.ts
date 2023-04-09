@@ -9,6 +9,7 @@ interface BullStrapi extends Strapi {
     questions: Queue
     artefacts: Queue
     summaries: Queue
+    embeddings: Queue
   }
   t: (key: string, locale: string) => string
 }

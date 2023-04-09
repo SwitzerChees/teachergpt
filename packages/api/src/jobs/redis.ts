@@ -32,10 +32,10 @@ const connectRedis = async (strapi: BullStrapi) => {
   await strapi.redis.ft.create(
     'idx:artefacts',
     {
-      transcript: {
+      '$.transcript': {
         type: SchemaFieldTypes.TEXT,
       },
-      embedding: {
+      '$.embedding': {
         type: SchemaFieldTypes.VECTOR,
         ALGORITHM: VectorAlgorithms.HNSW,
         DIM: 1536,
@@ -44,7 +44,7 @@ const connectRedis = async (strapi: BullStrapi) => {
       },
     },
     {
-      ON: 'HASH',
+      ON: 'JSON',
       PREFIX: 'embedding:',
     }
   )
@@ -61,18 +61,6 @@ const createRedisQuery = (queryVector: number[], topK: number): string => {
   const vectorString = queryVector.map((val) => val.toString()).join(' ')
   return `@embedding:[(${vectorString}) TOPK ${topK}]`
 }
-
-// def search_vectors(query_vector, client, top_k=5):
-//     base_query = "*=>[KNN 5 @embedding $vector AS vector_score]"
-//     query = Query(base_query).return_fields("url", "vector_score").sort_by("vector_score").dialect(2)
-
-//     try:
-//         results = client.ft("posts").search(query, query_params={"vector": query_vector})
-//     except Exception as e:
-//         print("Error calling Redis search: ", e)
-//         return None
-
-//     return results
 
 export const searchVectors = async (strapi: BullStrapi, queryVector: number[], topK = 5) => {
   const baseQuery = createRedisQuery(queryVector, topK)

@@ -32,23 +32,31 @@ const connectBull = (strapi: BullStrapi) => {
     ...defaultQueueOptions,
     defaultJobOptions: { ...defaultQueueOptions.defaultJobOptions },
   })
+  const embeddingsQueue = new Queue('embeddings', {
+    ...defaultQueueOptions,
+    defaultJobOptions: { ...defaultQueueOptions.defaultJobOptions },
+  })
   // Only process Queues if the server is a worker or has all roles
   if (role === ServerRoles.All || role === ServerRoles.Worker) {
     const accessCacheWorker = new Worker('questions', processQuestions(strapi), defaultQueueOptions)
     const artefactsWorker = new Worker('artefacts', processArtefacts(strapi), defaultQueueOptions)
     const summariesWorker = new Worker('summaries', processSummaries(strapi), defaultQueueOptions)
+    const embeddingsWorker = new Worker('embeddings', processEmbeddings(strapi), defaultQueueOptions)
     strapi.log.info(`Bull Worker Started: ${accessCacheWorker.name}`)
     strapi.log.info(`Bull Worker Started: ${artefactsWorker.name}`)
     strapi.log.info(`Bull Worker Started: ${summariesWorker.name}`)
+    strapi.log.info(`Bull Worker Started: ${embeddingsWorker.name}`)
   }
   strapi.bull = {
     questions: questionsQueue,
     artefacts: artefactsQueue,
     summaries: summariesQueue,
+    embeddings: embeddingsQueue,
   }
   strapi.bull.questions.add('processQuestions', undefined, { repeat: { every: 1000 } })
   strapi.bull.artefacts.add('processArtefacts', undefined, { repeat: { every: 1000 } })
   strapi.bull.summaries.add('processSummaries', undefined, { repeat: { every: 1000 } })
+  strapi.bull.embeddings.add('prcessEmbeddings', undefined, {})
   const url = `redis://${host}:${port}`
   strapi.log.info(`Bull Queue Connected: ${url}`)
 }
@@ -111,11 +119,12 @@ const processArtefacts = (strapi: BullStrapi) => {
       if (!transcript) continue
       strapi.log.info(`Create Embeddings: ${filePath}`)
       const splittedTranscript = splitStringIntoSubstrings(openArtefact.transcript)
-      const embeddings: number[][] = []
-      for (const transcript of splittedTranscript) {
-        const embedding = await getEmbeddings(transcript)
-        if (embedding) embeddings.push(embedding)
+      const embeddings: { transcript: string; embedding: number[] }[] = []
+      for (const splittedTrans of splittedTranscript) {
+        const embedding = await getEmbeddings(splittedTrans)
+        if (embedding) embeddings.push({ transcript: splittedTrans, embedding })
       }
+      strapi.bull.embeddings.add('prcessEmbeddings', undefined, {})
       await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { transcript, embeddings, status: 'done' } })
     }
   }
@@ -156,31 +165,31 @@ const processSummaries = (strapi: BullStrapi) => {
   }
 }
 
-// const processEmbeddings = (strapi: BullStrapi) => {
-//   return async (_1: Job) => {
-//     const openArtefacts = (await strapi.entityService.findMany('api::artefact.artefact', {
-//       filters: {
-//         status: 'done',
-//       },
-//       populate: {
-//         file: true,
-//         course: true,
-//         lesson: true,
-//       },
-//     })) as Artefact[]
-//     let embeddingCount = 1
-//     for (const openArtefact of openArtefacts) {
-//       strapi.log.info(`Processing Embeddings: ${openArtefact.id}`)
-//       if (!openArtefact.file) continue
-//       if (!openArtefact.transcript) continue
-//       if (!openArtefact.embeddings) continue
-//       for (const embedding of openArtefact.embeddings) {
-//         // strapi.redis.hSet(`embedding:${openArtefact.id}`, JSON.stringify(embedding))
-//         // embeddingCount++
-//       }
-//     }
-//   }
-// }
+const processEmbeddings = (strapi: BullStrapi) => {
+  return async (_1: Job) => {
+    const openArtefacts = (await strapi.entityService.findMany('api::artefact.artefact', {
+      filters: {
+        status: 'done',
+      },
+      populate: {
+        file: true,
+        course: true,
+        lesson: true,
+      },
+    })) as Artefact[]
+    let embeddingCount = 1
+    for (const openArtefact of openArtefacts) {
+      strapi.log.info(`Processing Embeddings: ${openArtefact.id}`)
+      if (!openArtefact.file) continue
+      if (!openArtefact.transcript) continue
+      if (!openArtefact.embeddings) continue
+      for (const embedding of openArtefact.embeddings) {
+        strapi.redis.json.set(`embedding::${embeddingCount}`, '.', embedding)
+        embeddingCount++
+      }
+    }
+  }
+}
 
 const splitStringIntoSubstrings = (inputString: string, maxLength = 250): string[] => {
   const substrings: string[] = []
