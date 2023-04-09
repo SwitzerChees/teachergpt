@@ -45,3 +45,17 @@ export const getTranscript = async (path: string) => {
     return ''
   }
 }
+
+export const getEmbeddings = async (text: string) => {
+  try {
+    const openai = new OpenAIApi(configuration)
+    const response = await openai.createEmbedding({
+      model: 'text-embedding-ada-002',
+      input: text,
+    })
+    return response.data.data[0].embedding
+  } catch (error) {
+    strapi.log.error(error)
+    return ''
+  }
+}

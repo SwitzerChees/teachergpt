@@ -7,6 +7,7 @@ interface Artefact extends StrapiObject {
   course: Course
   lesson: Lesson
   status: ProcessingStatus
+  embeddings: number[][]
 }
 
 export { Artefact }

@@ -1,3 +1,4 @@
+import { connectRedis } from './jobs'
 import { connectBull } from './jobs/bull'
 
 export default {
@@ -10,6 +11,7 @@ export default {
   async register({ strapi }) {
     const { role } = strapi.config.server
     strapi.log.info(`Server Role: ${role}`)
+    await connectRedis(strapi)
     await connectBull(strapi)
   },
 

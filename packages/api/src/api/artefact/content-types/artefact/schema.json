@@ -38,6 +38,9 @@
       "enum": ["open", "done", "archived"],
       "default": "open",
       "required": true
+    },
+    "embeddings": {
+      "type": "json"
     }
   }
 }

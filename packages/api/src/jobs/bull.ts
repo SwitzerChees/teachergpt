@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { Queue, Worker, Job, QueueOptions } from 'bullmq'
 import { Artefact, BullStrapi, Course, Lesson, Question, ServerRoles } from '@teachergpt/common'
-import { completePrompt, getTextFromPDF, getTranscript, questionPrompt } from '.'
+import { completePrompt, getEmbeddings, getTextFromPDF, getTranscript, questionPrompt } from '.'
 
 const connectBull = (strapi: BullStrapi) => {
   const {
@@ -95,10 +95,12 @@ const processArtefacts = (strapi: BullStrapi) => {
       let transcript = ''
       const filePath = resolve(currentFolder, '..', '..', '..', 'public', 'uploads', `${openArtefact.file.hash}${openArtefact.file.ext}`)
       strapi.log.info(`Processing Artefact: ${openArtefact.id}, ${openArtefact.file.name}`)
+      strapi.log.info(`Create Transcript: ${filePath}`)
       switch (openArtefact.file.ext) {
-        case '.pdf':
+        case '.pdf': {
           transcript = await getTextFromPDF(filePath)
           break
+        }
         case '.m4a':
           transcript = await getTranscript(filePath)
           break
@@ -107,7 +109,14 @@ const processArtefacts = (strapi: BullStrapi) => {
           break
       }
       if (!transcript) continue
-      await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { transcript, status: 'done' } })
+      strapi.log.info(`Create Embeddings: ${filePath}`)
+      const splittedTranscript = splitStringIntoSubstrings(openArtefact.transcript)
+      const embeddings: number[][] = []
+      for (const transcript of splittedTranscript) {
+        const embedding = await getEmbeddings(transcript)
+        if (embedding) embeddings.push(embedding)
+      }
+      await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { transcript, embeddings, status: 'done' } })
     }
   }
 }
@@ -145,6 +154,46 @@ const processSummaries = (strapi: BullStrapi) => {
       await strapi.entityService.update('api::lesson.lesson', openLesson.id, { data: { summary: summaryText, status: 'done' } })
     }
   }
+}
+
+// const processEmbeddings = (strapi: BullStrapi) => {
+//   return async (_1: Job) => {
+//     const openArtefacts = (await strapi.entityService.findMany('api::artefact.artefact', {
+//       filters: {
+//         status: 'done',
+//       },
+//       populate: {
+//         file: true,
+//         course: true,
+//         lesson: true,
+//       },
+//     })) as Artefact[]
+//     let embeddingCount = 1
+//     for (const openArtefact of openArtefacts) {
+//       strapi.log.info(`Processing Embeddings: ${openArtefact.id}`)
+//       if (!openArtefact.file) continue
+//       if (!openArtefact.transcript) continue
+//       if (!openArtefact.embeddings) continue
+//       for (const embedding of openArtefact.embeddings) {
+//         // strapi.redis.hSet(`embedding:${openArtefact.id}`, JSON.stringify(embedding))
+//         // embeddingCount++
+//       }
+//     }
+//   }
+// }
+
+const splitStringIntoSubstrings = (inputString: string, maxLength = 250): string[] => {
+  const substrings: string[] = []
+  let startIndex = 0
+
+  while (startIndex < inputString.length) {
+    const endIndex = startIndex + maxLength
+    const substring = inputString.slice(startIndex, endIndex)
+    substrings.push(substring)
+    startIndex = endIndex
+  }
+
+  return substrings
 }
 
 export { connectBull }
