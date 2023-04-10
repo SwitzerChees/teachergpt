@@ -22,11 +22,6 @@ RUN yarn lint
 RUN yarn build:app
 RUN yarn build:common
 
-# Install and execute node-prune
-# RUN apt update && apt install curl -y
-# RUN curl -sf https://gobinaries.com/tj/node-prune | sh
-# RUN node-prune
-
 # Use production image
 FROM node:lts-buster
 

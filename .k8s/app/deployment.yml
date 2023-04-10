@@ -25,7 +25,7 @@ spec:
           command:
             - /bin/sh
             - '-c'
-            - yarn start:ui
+            - yarn start:app
           startupProbe:
             httpGet:
               path: /
