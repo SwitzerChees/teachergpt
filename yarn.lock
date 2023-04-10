@@ -1055,6 +1055,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
+"@bundled-es-modules/pdfjs-dist@^2.16.105-alpha.2":
+  version "2.16.105-alpha.2"
+  resolved "https://registry.yarnpkg.com/@bundled-es-modules/pdfjs-dist/-/pdfjs-dist-2.16.105-alpha.2.tgz#2b030f344c128143f1f618e13ab66bfe694a8662"
+  integrity sha512-z3TUDeFBA7SV8QgaQmbrAsnaJFnZ/dKuGhdnO9cprrBmiq1xsbbwbZRzJlVJsyQwqIbhiY5SnV+eLAUsr/n4fQ==
+
 "@casl/ability@5.4.4", "@casl/ability@^5.4.3":
   version "5.4.4"
   resolved "https://registry.yarnpkg.com/@casl/ability/-/ability-5.4.4.tgz#fbe54340c156248e73804942eed350903b27b9f3"
@@ -11399,6 +11404,11 @@ pdf-parse@^1.1.1:
   dependencies:
     debug "^3.1.0"
     node-ensure "^0.0.0"
+
+pdf-to-text@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/pdf-to-text/-/pdf-to-text-0.0.7.tgz#d1cd75b6a9f3782a14bcdf9fe6bc02f74cd7ecd3"
+  integrity sha512-NHWB7u/9q+SZ28UtEgJYljamp61j06oldHdvGik1729pzRFLCO4igbZwm0MOUWoIQUz4nla3n+cf3Jh7uiOZwQ==
 
 pdfjs-dist@^3.5.141:
   version "3.5.141"

@@ -24,12 +24,12 @@ const connectRedis = async (strapi: BullStrapi) => {
   let indexExists = true
   try {
     await strapi.redis.ft.info('idx:artefacts')
-    // await strapi.redis.ft.dropIndex('idx:artefacts')
   } catch (error) {
     indexExists = false
     strapi.log.error(error)
   }
 
+  // await strapi.redis.ft.dropIndex('idx:artefacts')
   if (!indexExists) {
     await strapi.redis.ft.create(
       'idx:artefacts',
@@ -45,6 +45,10 @@ const connectRedis = async (strapi: BullStrapi) => {
         '$.transcript': {
           type: SchemaFieldTypes.TEXT,
           AS: 'transcript',
+        },
+        '$.source': {
+          type: SchemaFieldTypes.TEXT,
+          AS: 'source',
         },
         '$.embedding': {
           type: SchemaFieldTypes.VECTOR,

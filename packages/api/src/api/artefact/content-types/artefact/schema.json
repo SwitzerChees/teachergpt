@@ -41,6 +41,9 @@
     },
     "embeddings": {
       "type": "json"
+    },
+    "pages": {
+      "type": "json"
     }
   }
 }

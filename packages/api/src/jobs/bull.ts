@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { Queue, Worker, Job, QueueOptions } from 'bullmq'
-import { Artefact, BullStrapi, Course, Lesson, Question, ServerRoles } from '@teachergpt/common'
-import { completePrompt, getEmbeddings, getTextFromPDF, getTranscript, questionPrompt } from '.'
+import { Artefact, BullStrapi, Course, EmbeddingDocument, Lesson, PDFPage, Question, ServerRoles } from '@teachergpt/common'
+import { completePrompt, generateContext, getEmbeddings, getTextFromPDF, getTranscript, questionPrompt } from '.'
 
 const connectBull = (strapi: BullStrapi) => {
   const {
@@ -93,8 +93,8 @@ const processQuestions = (strapi: BullStrapi) => {
         },
         DIALECT: 2,
       })
-      const embeddingTranscripts = result.documents.map((d) => d.value.transcript) as string[]
-      const context = embeddingTranscripts.join('\n\n\n')
+      const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
+      const context = generateContext(embeddingDocuments)
       const prompt = questionPrompt(context, openQuestion.question)
       const completionText = await completePrompt(prompt)
       if (!completionText) continue
@@ -116,32 +116,40 @@ const processArtefacts = (strapi: BullStrapi) => {
     const currentFolder = resolve(__dirname)
     for (const openArtefact of openArtefacts) {
       if (!openArtefact.file) continue
-      let transcript = ''
       const filePath = resolve(currentFolder, '..', '..', '..', 'public', 'uploads', `${openArtefact.file.hash}${openArtefact.file.ext}`)
       strapi.log.info(`Processing Artefact: ${openArtefact.id}, ${openArtefact.file.name}`)
       strapi.log.info(`Create Transcript: ${filePath}`)
+      const enrichPayload: { transcript: string; embeddings: { transcript: string; embedding: number[] }[]; pages: PDFPage[] } = {
+        transcript: '',
+        embeddings: [],
+        pages: [],
+      }
       switch (openArtefact.file.ext) {
-        case '.pdf': {
-          transcript = await getTextFromPDF(filePath)
+        case '.pdf':
+          enrichPayload.pages = await getTextFromPDF(filePath)
           break
-        }
         case '.m4a':
-          transcript = await getTranscript(filePath)
+          enrichPayload.transcript = await getTranscript(filePath)
           break
         case '.mp3':
-          transcript = await getTranscript(filePath)
+          enrichPayload.transcript = await getTranscript(filePath)
           break
       }
-      if (!transcript) continue
       strapi.log.info(`Create Embeddings: ${filePath}`)
-      const splittedTranscript = splitStringIntoSubstrings(openArtefact.transcript)
-      const embeddings: { transcript: string; embedding: number[] }[] = []
-      for (const splittedTrans of splittedTranscript) {
-        const embedding = await getEmbeddings(splittedTrans)
-        if (embedding) embeddings.push({ transcript: splittedTrans, embedding })
+      if (enrichPayload.transcript) {
+        const splittedTranscript = splitStringIntoSubstrings(openArtefact.transcript, 500)
+        for (const splittedTrans of splittedTranscript) {
+          const embedding = await getEmbeddings(splittedTrans)
+          if (embedding) enrichPayload.embeddings.push({ transcript: splittedTrans, embedding })
+        }
+      } else if (enrichPayload.pages.length > 0) {
+        for (const page of enrichPayload.pages) {
+          const embedding = await getEmbeddings(page.text)
+          if (embedding) enrichPayload.embeddings.push({ transcript: page.text, embedding })
+        }
       }
       strapi.bull.embeddings.add('prcessEmbeddings', undefined, {})
-      await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { transcript, embeddings, status: 'done' } })
+      await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { ...enrichPayload, status: 'done' } })
     }
   }
 }
@@ -194,15 +202,19 @@ const processEmbeddings = (strapi: BullStrapi) => {
       },
     })) as Artefact[]
     let embeddingCount = 1
+    const keys = await strapi.redis.keys('embedding:*')
+    for (const key of keys) {
+      await strapi.redis.del(key)
+    }
     for (const openArtefact of openArtefacts) {
       strapi.log.info(`Processing Embeddings: ${openArtefact.id}`)
-      if (!openArtefact.file) continue
-      if (!openArtefact.transcript) continue
       if (!openArtefact.embeddings) continue
+      if (!openArtefact.file) continue
       for (const embedding of openArtefact.embeddings) {
         strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
           transcript: embedding.transcript,
           embedding: embedding.embedding,
+          source: openArtefact.file.name,
           courseId: openArtefact.course?.id,
           lessonId: openArtefact.lesson?.id,
         })
