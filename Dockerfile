@@ -1,4 +1,4 @@
-FROM node:lts-slim as build
+FROM node:lts-buster as build
 
 # Create app directory
 WORKDIR /app
@@ -28,7 +28,7 @@ RUN yarn build:common
 # RUN node-prune
 
 # Use production image
-FROM node:lts-slim
+FROM node:lts-buster
 
 WORKDIR /app
 
@@ -50,6 +50,8 @@ COPY --from=build /app/packages/common /app/packages/common
 
 # Copy files for api
 COPY --from=build /app/packages/api /app/packages/api
+
+RUN apt-get update && apt-get install poppler-utils -y
 
 ENV HOST 0.0.0.0
 EXPOSE 3000
