@@ -96,6 +96,7 @@ const processQuestions = (strapi: BullStrapi) => {
       const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
       const context = generateContext(embeddingDocuments)
       const prompt = questionPrompt(context, openQuestion.question)
+      strapi.log.info(`Prompt: ${prompt}`)
       const completionText = await completePrompt(prompt)
       if (!completionText) continue
       await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
