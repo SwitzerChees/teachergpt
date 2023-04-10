@@ -57,7 +57,7 @@ jobs:
         uses: swdotcom/update-and-apply-kubernetes-configs@v1
         with:
           k8-config-file-paths: |
-            .k8s/namespace.ymlpen
+            .k8s/namespace.yml
             .k8s/ui/nuxt-envs.yml
             .k8s/ui/deployment.yml
             .k8s/ui/service.yml
