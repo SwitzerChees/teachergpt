@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${APP_NAME}-ui
+  name: ${APP_NAME}-app
   namespace: ${KUBERNETES_NAMESPACE}
   labels:
-    app: ${APP_NAME}-ui
-    service: ui
+    app: ${APP_NAME}-app
+    service: app
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: ${APP_NAME}-ui
-      service: ui
+      app: ${APP_NAME}-app
+      service: app
   template:
     metadata:
       labels:
-        app: ${APP_NAME}-ui
-        service: ui
+        app: ${APP_NAME}-app
+        service: app
     spec:
       containers:
-        - name: ${APP_NAME}-ui
+        - name: ${APP_NAME}-app
           image: ${IMAGE_TAG}
           command:
             - /bin/sh

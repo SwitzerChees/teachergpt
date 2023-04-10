@@ -1,12 +1,14 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ${APP_NAME}-ui
+  name: ${APP_NAME}-app
   namespace: ${KUBERNETES_NAMESPACE}
   annotations:
     cert-manager.io/cluster-issuer: 'letsencrypt-${LETSENCRYPT_STAGE}'
     acme.cert-manager.io/http01-edit-in-place: 'true'
     nginx.ingress.kubernetes.io/from-to-www-redirect: 'true'
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 32k
+    nginx.ingress.kubernetes.io/proxy-buffers-number: '4'
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: 'true'
 spec:
@@ -22,6 +24,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: ${APP_NAME}-ui
+                name: ${APP_NAME}-app
                 port:
                   number: 80
