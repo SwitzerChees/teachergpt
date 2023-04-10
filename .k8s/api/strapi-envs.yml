@@ -5,6 +5,7 @@ metadata:
   name: strapi-envs
 type: Opaque
 stringData:
+  db_client: ${DB_CLIENT}
   db_host: ${DB_HOST}
   db_port: '${DB_PORT}'
   db_name: ${DB_NAME}

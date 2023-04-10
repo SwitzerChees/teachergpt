@@ -11,6 +11,7 @@ env:
   LETSENCRYPT_STAGE: prod
   BASE_URL: teachergpt.hackerman.ch
   STRAPI_URL: teachergpt-api.hackerman.ch
+  DB_CLIENT: postgres
   DB_HOST: postgresql.postgresql.svc.cluster.local
   DB_PORT: 5432
   DB_NAME: teachergpt

@@ -1,12 +1,13 @@
 import { defineStore, storeToRefs } from 'pinia'
 
-import { ProcessingStates, Question } from '@teachergpt/common/definitions'
+import { ProcessingStates, Question, User } from '@teachergpt/common/definitions'
 
 const questions = ref<Question[]>([])
 
 export const useQuestionsStore = defineStore('questions', () => {
   const { getSafeAPIResponse } = useAPI()
   const { find, create } = useStrapi()
+  const user = useStrapiUser()
 
   const fetchQuestions = async () => {
     const request = find('questions', {
@@ -21,6 +22,9 @@ export const useQuestionsStore = defineStore('questions', () => {
         },
         lesson: {
           fields: ['id', 'title'],
+        },
+        user: {
+          fields: ['id', 'email'],
         },
       },
       sort: ['createdAt:desc'],
@@ -55,6 +59,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   const addQuestion = async (question: string) => {
     const request = create('questions', {
       question,
+      user: user.value?.id,
       lesson: selectedLesson.value?.id,
       course: selectedCourse.value?.id,
     })
@@ -62,6 +67,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     if (!ok) return
     if (selectedCourse.value) result.course = selectedCourse.value
     if (selectedLesson.value) result.lesson = selectedLesson.value
+    if (user.value) result.user = user.value as unknown as User
     questions.value.unshift(result)
   }
 
