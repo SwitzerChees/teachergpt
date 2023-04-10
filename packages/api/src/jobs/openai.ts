@@ -16,7 +16,7 @@ const systemMessage: ChatCompletionRequestMessage[] = [
 export const completePrompt = async (prompt: string) => {
   try {
     const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo', // gpt-4-0314
+      model: process.env.OPENAI_GPT_MODEL || 'gpt-3.5-turbo', // gpt-4-0314
       messages: [...systemMessage, { role: 'user', content: prompt }],
     })
     const completionText = completion.data.choices[0].message.content
@@ -33,7 +33,7 @@ export const getTranscript = async (path: string) => {
     const audioFile = createReadStream(path)
     const response = await openai.createTranscription(
       audioFile, // The audio file to transcribe.
-      'whisper-1', // The model to use for transcription.
+      process.env.OPENAI_WHISPER_MODEL || 'whisper-1', // The model to use for transcription.
       undefined, // The prompt to use for transcription.
       'json', // The format of the transcription.
       1, // Temperature
@@ -50,7 +50,7 @@ export const getEmbeddings = async (text: string) => {
   try {
     const openai = new OpenAIApi(configuration)
     const response = await openai.createEmbedding({
-      model: 'text-embedding-ada-002',
+      model: process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-ada-002',
       input: text,
     })
     return response.data.data[0].embedding

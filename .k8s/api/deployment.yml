@@ -85,6 +85,26 @@ spec:
                 secretKeyRef:
                   name: strapi-envs
                   key: redis_port
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: openai_api_key
+            - name: OPENAI_GPT_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: openai_gpt_model
+            - name: OPENAI_WHISPER_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: openai_whisper_model
+            - name: OPENAI_EMBEDDING_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: openai_embedding_model
             - name: ADMIN_JWT_SECRET
               valueFrom:
                 secretKeyRef:
