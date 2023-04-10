@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APP_NAME}-ui
+  namespace: ${KUBERNETES_NAMESPACE}
+  labels:
+    app: ${APP_NAME}-ui
+    service: ui
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: ${APP_NAME}-ui
+      service: ui
+  template:
+    metadata:
+      labels:
+        app: ${APP_NAME}-ui
+        service: ui
+    spec:
+      containers:
+        - name: ${APP_NAME}-ui
+          image: ${IMAGE_TAG}
+          command:
+            - /bin/sh
+            - '-c'
+            - yarn start:ui
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            failureThreshold: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 3
+            periodSeconds: 5
+          env:
+            - name: NUXT_STRAPI_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nuxt-envs
+                  key: strapi_url
+            - name: NUXT_PUBLIC_STRAPI_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nuxt-envs
+                  key: strapi_url
+            - name: NUXT_PUBLIC_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nuxt-envs
+                  key: base_url
+            - name: NODE_ENV
+              value: production
+          ports:
+            - name: http
+              containerPort: 3000
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi

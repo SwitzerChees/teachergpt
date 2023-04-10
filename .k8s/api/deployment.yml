@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APP_NAME}-api
+  namespace: ${KUBERNETES_NAMESPACE}
+  labels:
+    app: ${APP_NAME}-api
+    service: api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: ${APP_NAME}-api
+      service: api
+  template:
+    metadata:
+      labels:
+        app: ${APP_NAME}-api
+        service: api
+    spec:
+      containers:
+        - name: ${APP_NAME}-api
+          image: ${IMAGE_TAG}
+          command:
+            - /bin/sh
+            - '-c'
+            - STRAPI_ADMIN_BACKEND_URL=$STRAPI_ADMIN_BACKEND_URL NODE_ENV=production yarn build:api && yarn start:api
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            failureThreshold: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 3
+            periodSeconds: 5
+          env:
+            - name: DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: db_host
+            - name: DATABASE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: db_port
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: db_name
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: db_user
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: db_password
+            - name: DATABASE_SSL
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: db_ssl
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: redis_host
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: redis_port
+            - name: ADMIN_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: admin_jwt_secret
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: jwt_secret
+            - name: APP_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: app_keys
+            - name: API_TOKEN_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: api_token_salt
+            - name: STRAPI_ADMIN_BACKEND_URL
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: base_url
+            - name: URL
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: base_url
+          ports:
+            - name: http
+              containerPort: 1337
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 4000m
+              memory: 4Gi
+          volumeMounts:
+            - name: strapi-data
+              mountPath: /app/packages/api/public/uploads
+
+      volumes:
+        - name: strapi-data
+          hostPath:
+            path: /opt/strapi-teachergpt
+            type: Directory

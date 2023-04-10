@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${APP_NAME}-api
+  namespace: ${KUBERNETES_NAMESPACE}
+  annotations:
+    nginx.ingress.kubernetes.io/from-to-www-redirect: 'true'
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
+    cert-manager.io/cluster-issuer: 'letsencrypt-${LETSENCRYPT_STAGE}'
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: 'true'
+spec:
+  tls:
+    - hosts:
+        - ${STRAPI_URL}
+      secretName: ${STRAPI_URL}-tls
+  rules:
+    - host: ${STRAPI_URL}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${APP_NAME}-api
+                port:
+                  number: 80

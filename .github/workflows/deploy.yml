@@ -1,0 +1,69 @@
+on:
+  push:
+    branches:
+      - master
+
+env:
+  DOCKERHUB_USERNAME: switzerchees
+  KUBERNETES_NAMESPACE: teachergpt
+  APP_NAME: teachergpt
+  IMAGE_TAG: switzerchees/teachergpt:${{ github.sha }}
+  LETSENCRYPT_STAGE: prod
+  BASE_URL: teachergpt.hackerman.ch
+  STRAPI_URL: teachergpt-api.hackerman.ch
+  DB_HOST: postgresql.postgresql.svc.cluster.local
+  DB_PORT: 5432
+  DB_NAME: teachergpt
+  DB_USER: postgres
+  REDIS_HOST: redis.redis.svc.cluster.local
+  REDIS_PORT: 6379
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  ADMIN_JWT_SECRET: ${{ secrets.STRAPI_ADMIN_JWT_SECRET }}
+  JWT_SECRET: ${{ secrets.STRAPI_JWT_SECRET }}
+  APP_KEYS: ${{ secrets.STRAPI_APP_KEYS }}
+  API_TOKEN_SALT: ${{ secrets.STRAPI_API_TOKEN_SALT }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - uses: docker/login-action@v2
+        name: Login to Docker Hub
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker Image to Docker Hub
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_TAG }}
+
+      - name: Check and Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+        id: install
+
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v3
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Replace and Apply Kubernetes Manifests
+        uses: swdotcom/update-and-apply-kubernetes-configs@v1
+        with:
+          k8-config-file-paths: |
+            .k8s/namespace.ymlpen
+            .k8s/ui/nuxt-envs.yml
+            .k8s/ui/deployment.yml
+            .k8s/ui/service.yml
+            .k8s/ui/ingress.yml
+            .k8s/api/strapi-envs.yml
+            .k8s/api/deployment.yml
+            .k8s/api/service.yml
+            .k8s/api/ingress.yml
+          replacement-method: defined
