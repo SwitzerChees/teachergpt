@@ -28,6 +28,13 @@ services:
   redis:
     image: redis/redis-stack:latest
     restart: unless-stopped
+    # command: >
+    #   redis-server
+    #   --loadmodule /opt/redis-stack/lib/redisearch.so
+    #   --loadmodule /opt/redis-stack/lib/rejson.so
+    #   --save ""
+    #   --appendonly no
+    #   --protected-mode no
     ports:
       - 8379:6379
       - 8001:8001
