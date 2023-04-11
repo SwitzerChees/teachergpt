@@ -209,11 +209,11 @@ const processEmbeddings = (strapi: BullStrapi) => {
       await strapi.redis.del(key)
     }
     for (const openArtefact of openArtefacts) {
-      strapi.log.info(`Adding Embeddings to Redis: ${openArtefact.id}`)
+      strapi.log.info(`Adding Embeddings to Redis: ${openArtefact.id}, ${openArtefact.file.name}`)
       if (!openArtefact.embeddings) continue
       if (!openArtefact.file) continue
       for (const embedding of openArtefact.embeddings) {
-        strapi.log.info(`Adding Embedding to Redis: ${embeddingCount}, ${openArtefact.file.name}`)
+        strapi.log.info(`Adding Embedding to Redis: ${embeddingCount}`)
         if (embedding.embedding.length !== 1536) {
           strapi.log.error(`Embedding has wrong length: ${embedding.embedding.length}`)
           continue
