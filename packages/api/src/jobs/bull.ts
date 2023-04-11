@@ -220,6 +220,7 @@ const processEmbeddings = (strapi: BullStrapi) => {
           lessonId: openArtefact.lesson?.id,
         })
         embeddingCount++
+        if (embeddingCount > 0) break
       }
     }
   }
