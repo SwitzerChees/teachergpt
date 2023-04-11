@@ -77,29 +77,34 @@ const processQuestions = (strapi: BullStrapi) => {
       },
     })) as Question[]
     for (const openQuestion of openQuestions) {
-      strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question}`)
-      const question = openQuestion.question
-      const questionEmbedding = await getEmbeddings(question)
-      const primarySearchQuery = openQuestion.lesson
-        ? `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}] @lessonId:[${openQuestion.lesson.id} ${openQuestion.lesson.id}])`
-        : `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}])`
-      const searchQuery = `${primarySearchQuery}=>[KNN 5 @embedding $blob AS dist]`
-      const float32Embedding = new Float32Array(questionEmbedding)
-      const embeddingBuffer = Buffer.from(float32Embedding.buffer)
-      const result = await strapi.redis.ft.search('idx:artefacts', searchQuery, {
-        SORTBY: 'dist',
-        PARAMS: {
-          blob: embeddingBuffer,
-        },
-        DIALECT: 2,
-      })
-      const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
-      const context = generateContext(embeddingDocuments)
-      const prompt = questionPrompt(context, openQuestion.question)
-      strapi.log.info(`Prompt: ${prompt}`)
-      const completionText = await completePrompt(prompt)
-      if (!completionText) continue
-      await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
+      try {
+        if (!openQuestion.course) throw new Error(`Question: ${openQuestion.id} has no course`)
+        strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question}`)
+        const question = openQuestion.question
+        const primarySearchQuery = openQuestion.lesson
+          ? `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}] @lessonId:[${openQuestion.lesson.id} ${openQuestion.lesson.id}])`
+          : `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}])`
+        const searchQuery = `${primarySearchQuery}=>[KNN 5 @embedding $blob AS dist]`
+        const questionEmbedding = await getEmbeddings(question)
+        const result = await strapi.redis.ft.search('idx:artefacts', '*=>[KNN 4 @embedding $BLOB AS dist]', {
+          PARAMS: {
+            BLOB: float32Buffer(questionEmbedding),
+          },
+          SORTBY: 'dist',
+          DIALECT: 2,
+          RETURN: ['dist'],
+        })
+        const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
+        const context = generateContext(embeddingDocuments)
+        const prompt = questionPrompt(context, openQuestion.question)
+        strapi.log.info(`Prompt: ${prompt}`)
+        const completionText = await completePrompt(prompt)
+        if (!completionText) continue
+        await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
+      } catch (error) {
+        strapi.log.error(error)
+        await strapi.entityService.update('api::question.question', openQuestion.id, { data: { status: 'done' } })
+      }
     }
   }
 }
@@ -218,17 +223,35 @@ const processEmbeddings = (strapi: BullStrapi) => {
           strapi.log.error(`Embedding has wrong length: ${embedding.embedding.length}`)
           continue
         }
-        await strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
-          transcript: embedding.transcript,
-          embedding: embedding.embedding,
-          source: openArtefact.file.name,
-          courseId: openArtefact.course?.id,
-          lessonId: openArtefact.lesson?.id,
-        })
-        embeddingCount++
+        try {
+          await strapi.redis.hSet(`embedding:${embeddingCount}`, {
+            transcript: embedding.transcript,
+            embedding: float32Buffer(embedding.embedding),
+            source: openArtefact.file.name,
+            courseId: openArtefact.course?.id,
+            lessonId: openArtefact.lesson?.id,
+          } as any)
+          embeddingCount++
+        } catch (error) {
+          strapi.log.error(error)
+        }
       }
     }
   }
+}
+
+const float32Buffer = (arr: number[]) => {
+  return Buffer.from(floatArrayToLittleEndianBytes(arr).buffer)
+}
+function floatArrayToLittleEndianBytes(floatArray: number[]): Uint8Array {
+  const buffer = new ArrayBuffer(floatArray.length * 4)
+  const view = new DataView(buffer)
+
+  for (let i = 0; i < floatArray.length; i++) {
+    view.setFloat32(i * 4, floatArray[i], true)
+  }
+
+  return new Uint8Array(buffer)
 }
 
 const splitStringIntoSubstrings = (inputString: string, maxLength = 250): string[] => {

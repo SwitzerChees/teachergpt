@@ -53,14 +53,14 @@ const connectRedis = async (strapi: BullStrapi) => {
         '$.embedding': {
           type: SchemaFieldTypes.VECTOR,
           ALGORITHM: VectorAlgorithms.HNSW,
-          DIM: 1536,
+          DIM: 6144,
           TYPE: 'FLOAT32',
-          DISTANCE_METRIC: 'L2',
+          DISTANCE_METRIC: 'COSINE',
           AS: 'embedding',
         },
       },
       {
-        ON: 'JSON',
+        ON: 'HASH',
         PREFIX: 'embedding:',
       }
     )
