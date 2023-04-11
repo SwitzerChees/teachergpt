@@ -202,7 +202,7 @@ const processEmbeddings = (strapi: BullStrapi) => {
         lesson: true,
       },
     })) as Artefact[]
-    // let embeddingCount = 1
+    let embeddingCount = 1
     const keys = await strapi.redis.keys('embedding:*')
     for (const key of keys) {
       await strapi.redis.del(key)
@@ -212,15 +212,14 @@ const processEmbeddings = (strapi: BullStrapi) => {
       if (!openArtefact.embeddings) continue
       if (!openArtefact.file) continue
       for (const embedding of openArtefact.embeddings) {
-        strapi.log.info(`Processing Embedding: ${embedding.transcript}`)
-        // await strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
-        //   transcript: embedding.transcript,
-        //   embedding: embedding.embedding,
-        //   source: openArtefact.file.name,
-        //   courseId: openArtefact.course?.id,
-        //   lessonId: openArtefact.lesson?.id,
-        // })
-        // embeddingCount++
+        await strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
+          transcript: embedding.transcript,
+          embedding: embedding.embedding,
+          source: openArtefact.file.name,
+          courseId: openArtefact.course?.id,
+          lessonId: openArtefact.lesson?.id,
+        })
+        embeddingCount++
       }
     }
   }
