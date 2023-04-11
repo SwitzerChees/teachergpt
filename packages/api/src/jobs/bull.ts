@@ -212,7 +212,7 @@ const processEmbeddings = (strapi: BullStrapi) => {
       if (!openArtefact.embeddings) continue
       if (!openArtefact.file) continue
       for (const embedding of openArtefact.embeddings) {
-        strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
+        await strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
           transcript: embedding.transcript,
           embedding: embedding.embedding,
           source: openArtefact.file.name,
