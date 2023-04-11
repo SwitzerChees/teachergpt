@@ -149,8 +149,8 @@ const processArtefacts = (strapi: BullStrapi) => {
           if (embedding) enrichPayload.embeddings.push({ transcript: page.text, embedding })
         }
       }
-      strapi.bull.embeddings.add('prcessEmbeddings', undefined, {})
       await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { ...enrichPayload, status: 'done' } })
+      strapi.bull.embeddings.add('prcessEmbeddings', undefined, {})
     }
   }
 }
