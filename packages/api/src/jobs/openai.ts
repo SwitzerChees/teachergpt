@@ -53,20 +53,9 @@ export const getEmbeddings = async (text: string) => {
       model: process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-ada-002',
       input: text,
     })
-    return toUInt8Array(response.data.data[0].embedding)
+    return response.data.data[0].embedding
   } catch (error) {
     strapi.log.error(error)
     return []
   }
-}
-
-const toUInt8Array = (arr: number[]) => {
-  const output = new Uint8Array(arr.length)
-  for (let i = 0; i < arr.length; i++) {
-    let tmp = Math.max(-1, Math.min(1, arr[i]))
-    tmp = tmp < 0 ? tmp * 0x8000 : tmp * 0x7fff
-    tmp = tmp / 256
-    output[i] = tmp + 128
-  }
-  return Array.from(output)
 }
