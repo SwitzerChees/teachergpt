@@ -214,13 +214,12 @@ const processEmbeddings = (strapi: BullStrapi) => {
       for (const embedding of openArtefact.embeddings) {
         await strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
           transcript: embedding.transcript,
-          embedding: embedding.embedding,
+          // embedding: embedding.embedding,
           source: openArtefact.file.name,
           courseId: openArtefact.course?.id,
           lessonId: openArtefact.lesson?.id,
         })
         embeddingCount++
-        if (embeddingCount > 0) break
       }
     }
   }
