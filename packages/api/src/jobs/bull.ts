@@ -78,28 +78,34 @@ const processQuestions = (strapi: BullStrapi) => {
     })) as Question[]
     for (const openQuestion of openQuestions) {
       strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question}`)
-      const question = openQuestion.question
-      const questionEmbedding = await getEmbeddings(question)
-      const primarySearchQuery = openQuestion.lesson
-        ? `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}] @lessonId:[${openQuestion.lesson.id} ${openQuestion.lesson.id}])`
-        : `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}])`
-      const searchQuery = `${primarySearchQuery}=>[KNN 5 @embedding $blob AS dist]`
-      const float32Embedding = new Float32Array(questionEmbedding)
-      const embeddingBuffer = Buffer.from(float32Embedding.buffer)
-      const result = await strapi.redis.ft.search('idx:artefacts', searchQuery, {
-        SORTBY: 'dist',
-        PARAMS: {
-          blob: embeddingBuffer,
-        },
-        DIALECT: 2,
-      })
-      const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
-      const context = generateContext(embeddingDocuments)
-      const prompt = questionPrompt(context, openQuestion.question)
-      strapi.log.info(`Prompt: ${prompt}`)
-      const completionText = await completePrompt(prompt)
-      if (!completionText) continue
-      await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
+
+      try {
+        const question = openQuestion.question
+        const questionEmbedding = await getEmbeddings(question)
+        const primarySearchQuery = openQuestion.lesson
+          ? `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}] @lessonId:[${openQuestion.lesson.id} ${openQuestion.lesson.id}])`
+          : `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}])`
+        const searchQuery = `${primarySearchQuery}=>[KNN 5 @embedding $blob AS dist]`
+        const float32Embedding = new Float32Array(questionEmbedding)
+        const embeddingBuffer = Buffer.from(float32Embedding.buffer)
+        const result = await strapi.redis.ft.search('idx:artefacts', searchQuery, {
+          SORTBY: 'dist',
+          PARAMS: {
+            blob: embeddingBuffer,
+          },
+          DIALECT: 2,
+        })
+        const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
+        const context = generateContext(embeddingDocuments)
+        const prompt = questionPrompt(context, openQuestion.question)
+        strapi.log.info(`Prompt: ${prompt}`)
+        const completionText = await completePrompt(prompt)
+        if (!completionText) continue
+        await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
+      } catch (error) {
+        strapi.log.error(error)
+        await strapi.entityService.update('api::question.question', openQuestion.id, { data: { status: 'done' } })
+      }
     }
   }
 }
