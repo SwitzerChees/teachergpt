@@ -78,24 +78,75 @@ const processQuestions = (strapi: BullStrapi) => {
     })) as Question[]
     for (const openQuestion of openQuestions) {
       strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question}`)
-
       try {
         const question = openQuestion.question
         const questionEmbedding = await getEmbeddings(question)
-        const primarySearchQuery = openQuestion.lesson
-          ? `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}] @lessonId:[${openQuestion.lesson.id} ${openQuestion.lesson.id}])`
-          : `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}])`
-        const searchQuery = `${primarySearchQuery}=>[KNN 5 @embedding $blob AS dist]`
-        const float32Embedding = new Float32Array(questionEmbedding)
-        const embeddingBuffer = Buffer.from(float32Embedding.buffer)
-        const result = await strapi.redis.ft.search('idx:artefacts', searchQuery, {
-          SORTBY: 'dist',
-          PARAMS: {
-            blob: embeddingBuffer,
+        // const primarySearchQuery = openQuestion.lesson
+        //   ? `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}] @lessonId:[${openQuestion.lesson.id} ${openQuestion.lesson.id}])`
+        //   : `(@courseId:[${openQuestion.course.id} ${openQuestion.course.id}])`
+        // const searchQuery = `${primarySearchQuery}=>[KNN 5 @embedding $blob AS dist]`
+        // const float32Embedding = new Float32Array(questionEmbedding)
+        // const embeddingBuffer = Buffer.from(float32Embedding.buffer)
+        // const result = await strapi.redis.ft.search('idx:artefacts', searchQuery, {
+        //   SORTBY: 'dist',
+        //   PARAMS: {
+        //     blob: embeddingBuffer,
+        //   },
+        //   DIALECT: 2,
+        // })
+        // const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
+        const operands = [
+          {
+            path: ['courseId'],
+            operator: 'Equal',
+            valueNumber: openQuestion.course.id,
           },
-          DIALECT: 2,
-        })
-        const embeddingDocuments = result.documents.map((d) => d.value as unknown as EmbeddingDocument)
+        ]
+        if (openQuestion.lesson) {
+          operands.push({
+            path: ['lessonId'],
+            operator: 'Equal',
+            valueNumber: openQuestion.lesson.id,
+          })
+        }
+        const embeddingDocuments = [] as EmbeddingDocument[]
+        try {
+          const weaviateResult = await strapi.weaviate.graphql
+            .get()
+            .withClassName('Embedding')
+            .withFields('transcript _additional {certainty distance}')
+            .withWhere({
+              operator: 'And',
+              operands: operands as any,
+            })
+            .withNearText({
+              concepts: [question],
+            })
+            .withLimit(5)
+            .do()
+          embeddingDocuments.push(...weaviateResult.data.Get.Embedding)
+        } catch (error) {
+          strapi.log.error(error)
+        }
+        try {
+          const searchParams = {
+            anns_field: 'embedding',
+            topk: '5',
+            metric_type: 'L2',
+            params: JSON.stringify({ nprobe: 10 }),
+          }
+          const resultsMilvus = await strapi.milvus.dataManager.search({
+            collection_name: 'embedding',
+            expr: '',
+            vectors: [questionEmbedding],
+            search_params: searchParams,
+            vector_type: 101, // DataType.FloatVector
+          })
+          strapi.log.info(resultsMilvus)
+        } catch (error) {
+          strapi.log.error(error)
+        }
+
         const context = generateContext(embeddingDocuments)
         const prompt = questionPrompt(context, openQuestion.question)
         strapi.log.info(`Prompt: ${prompt}`)
@@ -224,13 +275,27 @@ const processEmbeddings = (strapi: BullStrapi) => {
           strapi.log.error(`Embedding has wrong length: ${embedding.embedding.length}`)
           continue
         }
-        await strapi.redis.json.set(`embedding:${embeddingCount}`, '.', {
+        const embeddingDocument: EmbeddingDocument = {
           transcript: embedding.transcript,
           embedding: embedding.embedding,
           source: openArtefact.file.name,
           courseId: openArtefact.course?.id,
           lessonId: openArtefact.lesson?.id,
-        })
+        }
+        await strapi.redis.json.set(`embedding:${embeddingCount}`, '.', embeddingDocument as any)
+        await strapi.weaviate.data
+          .creator()
+          .withClassName('Embedding')
+          .withProperties(embeddingDocument as any)
+          .do()
+        try {
+          await strapi.milvus.dataManager.insert({
+            collection_name: 'embedding',
+            fields_data: [{ ...embeddingDocument, id: embeddingCount }],
+          })
+        } catch (error) {
+          strapi.log.error(error)
+        }
         embeddingCount++
       }
     }

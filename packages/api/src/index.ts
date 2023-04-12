@@ -1,5 +1,4 @@
-import { connectRedis } from './jobs'
-import { connectBull } from './jobs/bull'
+import { connectRedis, connectBull, connectWeaviate, connectMilvus } from './jobs'
 
 export default {
   /**
@@ -13,6 +12,8 @@ export default {
     strapi.log.info(`Server Role: ${role}`)
     await connectRedis(strapi)
     await connectBull(strapi)
+    await connectWeaviate(strapi)
+    await connectMilvus(strapi)
   },
 
   /**
