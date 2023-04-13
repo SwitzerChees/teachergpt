@@ -26,7 +26,7 @@
       <Skeleton width="10rem"></Skeleton>
     </div>
     <div v-else>
-      <Markdown :source="question.answer || ''" class="markdown-format" />
+      <Markdown :source="formatedAnswer" class="markdown-format" />
     </div>
   </div>
 </template>
@@ -34,12 +34,39 @@
   import { Question } from '@teachergpt/common'
   import { formatDate } from '~/utils'
 
-  defineProps<{ question: Question }>()
+  const props = defineProps<{ question: Question }>()
+
+  const formatedAnswer = computed(() => {
+    return props.question.answer || ''
+  })
 </script>
 
 <style>
+  .markdown-format {
+    display: flex;
+    flex-direction: column;
+  }
   .markdown-format li {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+  }
+  .markdown-format table {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .markdown-format table th {
+    text-align: left;
+  }
+  .markdown-format table th,
+  .markdown-format table td {
+    padding: 0.5rem;
+    border: 1px solid;
+    border-color: rgb(55 65 81);
+  }
+  .markdown-format table tr:nth-child(2n) {
+    background-color: rgb(55 65 81);
+  }
+  .markdown-format {
+    word-break: break-all;
   }
 </style>
