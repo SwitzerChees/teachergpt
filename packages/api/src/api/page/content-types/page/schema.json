@@ -22,6 +22,12 @@
       "relation": "manyToOne",
       "target": "api::artefact.artefact",
       "inversedBy": "pages"
+    },
+    "embedding": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::embedding.embedding",
+      "mappedBy": "page"
     }
   }
 }

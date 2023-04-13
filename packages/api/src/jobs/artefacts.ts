@@ -32,10 +32,10 @@ export const processArtefacts = (strapi: BullStrapi) => {
           }
           for (const page of pages) {
             const embedding = await getEmbeddings(page.text)
-            await strapi.entityService.create('api::embedding.embedding', {
+            const newEmbedding = await strapi.entityService.create('api::embedding.embedding', {
               data: { text: page.text, embedding, artefact: openArtefact.id },
             })
-            await strapi.entityService.create('api::page.page', { data: { ...page, artefact: openArtefact.id } })
+            await strapi.entityService.create('api::page.page', { data: { ...page, artefact: openArtefact.id, embedding: newEmbedding } })
           }
           await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { status: 'done' } })
         }

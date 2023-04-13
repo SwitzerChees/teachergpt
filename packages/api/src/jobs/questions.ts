@@ -41,6 +41,7 @@ export const processQuestions = (strapi: BullStrapi) => {
                 },
               },
             },
+            page: true,
           },
         })) as Embedding[]
         const questionEmbedding = await getEmbeddings(question)

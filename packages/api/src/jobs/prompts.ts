@@ -5,11 +5,11 @@ export const generateSystemMessage = () => {
   VORGABEN:
   - Der KONTEXT soll zur Beantwortung der Frage dienen und hat somit Pirorität
   - Falls du die Antwort im Kontext nicht findest, sag du hast keine Antwort auf diese Frage
-  - Erwähne nicht, dass die Antwort aus dem Kontext stammt
+  - Erwähne den Kontext nicht in deiner Antwort
   - Kennzeichne deine Antwort NICHT als Antwort
-  - Formatiere die Antwort IMMER mit Markdown aber schreibe nicht dazu, dass es Markdown ist
+  - Formatiere die Antwort mit Markdown wenn nötig, erwähne NIE das Format
   - Versuche dich nicht zu wiederholen
-  - Gib am Schluss der Antwort jeweils die Quelle aus der die Information stammt ab im Format \nQuelle:
+  - Gib am Schluss der Antwort IMMER die Quelle vom Kontext aus der die Information stammt an im Format \n**Quelle: {Kontext}**
   `
 }
 
@@ -29,7 +29,10 @@ export const questionPrompt = (context: string, question: string) => {
 export const generateContext = (embeddings: Embedding[]) => {
   let context = ''
   for (const embedding of embeddings) {
-    context += `Quelle: ${embedding?.artefact?.file?.name}: \n\n${embedding.text}\n\n\n `
+    let source = `**Quelle: ${embedding?.artefact?.file?.name}`
+    if (embedding.page) source += `, Seite ${embedding.page.pageNumber}`
+    source += '**:'
+    context += `**Quelle: ${source}**: \n\n${embedding.text}\n\n\n `
   }
   return context
 }

@@ -23,6 +23,12 @@
     },
     "embedding": {
       "type": "json"
+    },
+    "page": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::page.page",
+      "inversedBy": "embedding"
     }
   }
 }
