@@ -1,4 +1,4 @@
-import { EmbeddingDocument } from '@teachergpt/common'
+import { Embedding } from '@teachergpt/common'
 
 export const generateSystemMessage = () => {
   return `Du bist TeacherGPT. Ein superstarkes Sprachmodell, das Schülern helfen soll, Antworten auf ihre Fragen zu finden. 
@@ -26,10 +26,10 @@ export const questionPrompt = (context: string, question: string) => {
   return messageTemplate
 }
 
-export const generateContext = (embeddingDocuments: EmbeddingDocument[]) => {
+export const generateContext = (embeddings: Embedding[]) => {
   let context = ''
-  for (const embeddingDocument of embeddingDocuments) {
-    context += `Quelle: ${embeddingDocument.source}: \n\n${embeddingDocument.transcript}\n\n\n `
+  for (const embedding of embeddings) {
+    context += `Quelle: ${embedding?.artefact?.file?.name}: \n\n${embedding.text}\n\n\n `
   }
   return context
 }

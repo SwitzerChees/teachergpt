@@ -1,15 +1,15 @@
 import { existsSync } from 'fs'
 import pdfUtil from 'pdf-to-text'
-import { PDFPage } from '@teachergpt/common'
+import { Page } from '@teachergpt/common'
 
-export const getTextFromPDF = async (path: string): Promise<PDFPage[]> => {
-  const pdfPages: PDFPage[] = []
+export const getTextFromPDF = async (path: string): Promise<Page[]> => {
+  const pdfPages: Page[] = []
   try {
     if (!existsSync(path)) return []
     const pdfInfo = await getPDFInfo(path)
     for (let i = 1; i <= pdfInfo.pages; i++) {
       const textFromPage = await extractTextFromPDF(path, { from: i, to: i })
-      pdfPages.push({ pageNumber: i, text: textFromPage })
+      pdfPages.push({ pageNumber: i, text: textFromPage } as any)
     }
   } catch (error) {
     strapi.log.error(error)

@@ -39,11 +39,17 @@
       "default": "open",
       "required": true
     },
-    "embeddings": {
-      "type": "json"
-    },
     "pages": {
-      "type": "json"
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::page.page",
+      "mappedBy": "artefact"
+    },
+    "embeddings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::embedding.embedding",
+      "mappedBy": "artefact"
     }
   }
 }

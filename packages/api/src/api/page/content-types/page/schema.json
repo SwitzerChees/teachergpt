@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Page"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "pageNumber": {
+      "type": "integer"
+    },
+    "text": {
+      "type": "text"
+    },
+    "artefact": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::artefact.artefact",
+      "inversedBy": "pages"
+    }
+  }
+}

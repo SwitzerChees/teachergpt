@@ -1,5 +1,5 @@
 import { ProcessingStatus } from '../../enums'
-import { Course, Lesson, StrapiAsset, StrapiObject } from '.'
+import { Course, Embedding, Lesson, Page, StrapiAsset, StrapiObject } from '.'
 
 interface Artefact extends StrapiObject {
   file: StrapiAsset
@@ -7,7 +7,8 @@ interface Artefact extends StrapiObject {
   course: Course
   lesson: Lesson
   status: ProcessingStatus
-  embeddings: { transcript: string; embedding: number[] }[]
+  pages: Page[]
+  embeddings: Embedding[]
 }
 
 export { Artefact }

@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "embeddings",
+  "info": {
+    "singularName": "embedding",
+    "pluralName": "embeddings",
+    "displayName": "Embedding",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    },
+    "artefact": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::artefact.artefact",
+      "inversedBy": "embeddings"
+    },
+    "embedding": {
+      "type": "json"
+    }
+  }
+}
