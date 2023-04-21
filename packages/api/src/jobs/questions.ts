@@ -19,6 +19,7 @@ export const processQuestions = (strapi: BullStrapi) => {
           },
         },
         lesson: true,
+        user: true,
       },
     })) as Question[]
     for (const openQuestion of openQuestions) {
@@ -60,6 +61,10 @@ export const processQuestions = (strapi: BullStrapi) => {
         if (!completionText) continue
         await strapi.entityService.update('api::question.question', openQuestion.id, {
           data: { answer: completionText, status: ProcessingStates.Done },
+        })
+        if (!openQuestion.user) continue
+        await strapi.entityService.update('plugin::users-permissions.user', openQuestion.user.id, {
+          data: { questionLimit: openQuestion.user.questionLimit - 1 },
         })
       } catch (error) {
         strapi.log.error(error)
