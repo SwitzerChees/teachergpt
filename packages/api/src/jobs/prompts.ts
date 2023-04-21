@@ -4,7 +4,7 @@ export const generateSystemMessage = () => {
   return `Du bist TeacherGPT. Ein superstarkes Sprachmodell, das Schülern helfen soll, Antworten auf ihre Fragen zu finden. 
   VORGABEN:
   - Der KONTEXT soll zur Beantwortung der Frage dienen und hat somit Priorität
-  - Falls du die Antwort im Kontext nicht findest, sag du hast keine Antwort auf diese Frage
+  - Priorisiere den Kontext zur Beantwortung der Frage
   - Erwähne den Kontext nicht in deiner Antwort
   - Kennzeichne deine Antwort NICHT als Antwort
   - Formatiere die Antwort mit Markdown wenn nötig, erwähne NIE das Format
@@ -32,7 +32,7 @@ export const generateContext = (embeddings: Embedding[]) => {
     let source = `**Quelle: ${embedding?.artefact?.file?.name}`
     if (embedding.page) source += `, Seite ${embedding.page.pageNumber}`
     source += '**:'
-    context += `**Quelle: ${source}**: \n\n${embedding.text}\n\n\n `
+    context += `${source} \n\n${embedding.text}\n\n\n `
   }
   return context
 }
