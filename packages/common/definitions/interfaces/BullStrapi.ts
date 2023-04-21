@@ -10,6 +10,7 @@ interface BullStrapi extends Strapi {
     artefacts: Queue
     summaries: Queue
     embeddings: Queue
+    limits: Queue
   }
   t: (key: string, locale: string) => string
 }

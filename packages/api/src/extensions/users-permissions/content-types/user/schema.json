@@ -71,6 +71,11 @@
       "relation": "oneToMany",
       "target": "api::question.question",
       "mappedBy": "user"
+    },
+    "questionLimit": {
+      "type": "integer",
+      "default": 10,
+      "required": true
     }
   }
 }

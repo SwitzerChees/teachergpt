@@ -14,6 +14,7 @@ interface User extends StrapiObject {
   smsToken?: string
   smsTokenCreatedAt?: Date
   question: Question[]
+  questionLimit: number
 }
 
 export { User }

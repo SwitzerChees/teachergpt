@@ -3,11 +3,16 @@ import { defineStore, storeToRefs } from 'pinia'
 import { ProcessingStates, Question, User } from '@teachergpt/common/definitions'
 
 const questions = ref<Question[]>([])
+const questionLimit = ref(0)
 
 export const useQuestionsStore = defineStore('questions', () => {
   const { getSafeAPIResponse } = useAPI()
   const { find, create } = useStrapi()
   const user = useStrapiUser()
+
+  if (user.value) {
+    questionLimit.value = (user.value as unknown as User).questionLimit || 0
+  }
 
   const fetchQuestions = async () => {
     const request = find('questions', {
@@ -65,6 +70,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     })
     const { ok, result } = await getSafeAPIResponse<Question>(request)
     if (!ok) return
+    questionLimit.value--
     if (selectedCourse.value) result.course = selectedCourse.value
     if (selectedLesson.value) result.lesson = selectedLesson.value
     if (user.value) result.user = user.value as unknown as User
@@ -80,5 +86,5 @@ export const useQuestionsStore = defineStore('questions', () => {
     fetchOpenQuestions()
   }, 2000)
 
-  return { questions, fetchQuestions, addQuestion }
+  return { questions, questionLimit, fetchQuestions, addQuestion }
 })
