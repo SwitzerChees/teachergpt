@@ -50,6 +50,12 @@
       "enum": ["open", "done", "archived"],
       "default": "open",
       "required": true
+    },
+    "school": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::school.school",
+      "inversedBy": "courses"
     }
   }
 }

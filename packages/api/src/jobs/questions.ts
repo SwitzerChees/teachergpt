@@ -1,4 +1,4 @@
-import { BullStrapi, Embedding, Question } from '@teachergpt/common'
+import { BullStrapi, Embedding, ProcessingStates, Question } from '@teachergpt/common'
 import { Job } from 'bullmq'
 import { completePrompt, getEmbeddings } from './openai'
 import { generateContext, questionPrompt } from './prompts'
@@ -7,7 +7,7 @@ export const processQuestions = (strapi: BullStrapi) => {
   return async (_1: Job) => {
     const openQuestions = (await strapi.entityService.findMany('api::question.question', {
       filters: {
-        status: 'open',
+        status: ProcessingStates.Open,
         course: {
           id: { $ne: null },
         },
@@ -58,10 +58,12 @@ export const processQuestions = (strapi: BullStrapi) => {
         strapi.log.info(`Prompt: ${prompt}`)
         const completionText = await completePrompt(prompt)
         if (!completionText) continue
-        await strapi.entityService.update('api::question.question', openQuestion.id, { data: { answer: completionText, status: 'done' } })
+        await strapi.entityService.update('api::question.question', openQuestion.id, {
+          data: { answer: completionText, status: ProcessingStates.Done },
+        })
       } catch (error) {
         strapi.log.error(error)
-        await strapi.entityService.update('api::question.question', openQuestion.id, { data: { status: 'done' } })
+        await strapi.entityService.update('api::question.question', openQuestion.id, { data: { status: ProcessingStates.Error } })
       }
       strapi.log.info(`Processing Question: ${openQuestion.id}, ${openQuestion.question} - DONE`)
     }

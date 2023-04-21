@@ -13,7 +13,7 @@ export const useSidebarsStore = defineStore('sidebars', () => {
   const route = useRoute()
 
   const fetchCourses = async () => {
-    const request = find('courses', { filters: { status: { $ne: ProcessingStates.Archived } } })
+    const request = find('courses', { filters: { status: { $ne: ProcessingStates.Archived } }, populate: ['school'] })
     const { ok, result } = await getSafeAPIResponse<Course[]>(request)
     if (!ok) return
     courses.value = result

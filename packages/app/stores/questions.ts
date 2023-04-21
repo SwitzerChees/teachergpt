@@ -35,7 +35,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   }
 
   const fetchOpenQuestions = async () => {
-    const openQuestions = questions.value.filter((q) => q.status === 'open')
+    const openQuestions = questions.value.filter((q) => q.status === ProcessingStates.Open)
     if (openQuestions.length === 0) return
     const request = find('questions', {
       fields: ['id', 'answer', 'status'],
@@ -48,7 +48,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     const { ok, result } = await getSafeAPIResponse<Question[]>(request)
     if (!ok) return
     for (const openQuestion of result) {
-      if (openQuestion.status !== 'done') continue
+      if (openQuestion.status !== ProcessingStates.Error && openQuestion.status !== ProcessingStates.Done) continue
       const foundQuestion = questions.value.find((q) => q.id === openQuestion.id)
       if (!foundQuestion) continue
       foundQuestion.answer = openQuestion.answer

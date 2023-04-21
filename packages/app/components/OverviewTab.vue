@@ -1,5 +1,5 @@
 <template>
-  <TabView class="grow">
+  <TabView class="grow panel-full-height">
     <TabPanel header="Fragen">
       <OverviewQuestions />
     </TabPanel>

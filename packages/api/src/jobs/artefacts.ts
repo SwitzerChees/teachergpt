@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { Artefact, BullStrapi } from '@teachergpt/common'
+import { Artefact, BullStrapi, ProcessingStates } from '@teachergpt/common'
 import { Job } from 'bullmq'
 import { getTextFromPDF } from './pdf'
 import { getEmbeddings, getTranscript } from './openai'
@@ -8,7 +8,7 @@ export const processArtefacts = (strapi: BullStrapi) => {
   return async (_1: Job) => {
     const openArtefacts = (await strapi.entityService.findMany('api::artefact.artefact', {
       filters: {
-        status: 'open',
+        status: ProcessingStates.Open,
       },
       populate: {
         file: true,
@@ -37,7 +37,7 @@ export const processArtefacts = (strapi: BullStrapi) => {
             })
             await strapi.entityService.create('api::page.page', { data: { ...page, artefact: openArtefact.id, embedding: newEmbedding } })
           }
-          await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { status: 'done' } })
+          await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { status: ProcessingStates.Done } })
         }
         if (openArtefact.file.ext === '.m4a' || openArtefact.file.ext === '.mp3') {
           const transcript = await getTranscript(filePath)
@@ -48,12 +48,17 @@ export const processArtefacts = (strapi: BullStrapi) => {
               data: { text: splittedTrans, embedding, artefact: openArtefact.id },
             })
           }
-          await strapi.entityService.update('api::artefact.artefact', openArtefact.id, { data: { transcript, status: 'done' } })
+          await strapi.entityService.update('api::artefact.artefact', openArtefact.id, {
+            data: { transcript, status: ProcessingStates.Done },
+          })
         }
         strapi.log.info(`Processing Artefact: ${openArtefact.id}, ${openArtefact.file.name} - DONE`)
         strapi.bull.embeddings.add('prcessEmbeddings', undefined, {})
       } catch (error) {
         strapi.log.error(error)
+        await strapi.entityService.update('api::artefact.artefact', openArtefact.id, {
+          data: { status: ProcessingStates.Error },
+        })
       }
     }
   }

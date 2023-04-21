@@ -17,13 +17,17 @@
       </div>
     </div>
     <span class="font-bold">Antwort</span>
-    <div v-if="question.status === 'open'" class="flex flex-col gap-2">
-      <span class="text-sm text-orange-400"
+    <div v-if="question.status === ProcessingStates.Open" class="flex flex-col gap-2">
+      <span class="text-orange-400"
         >Gib mir einen moment ich durchsuche die Kursmaterialien für dich um eine passende Antwort zu liefern...</span
       >
       <Skeleton></Skeleton>
       <Skeleton width="20rem"></Skeleton>
       <Skeleton width="10rem"></Skeleton>
+    </div>
+    <div v-else-if="question.status === ProcessingStates.Error" class="flex flex-col gap-2">
+      <span class="text-red-400">Da ist was schief gelaufen. Ich konnte leider keine passende Antwort finden.</span>
+      <span class="text-red-400">Bitte versuche es später noch einmal.</span>
     </div>
     <div v-else>
       <Markdown :source="formatedAnswer" class="markdown-format" />
@@ -32,6 +36,7 @@
 </template>
 <script setup lang="ts">
   import { Question } from '@teachergpt/common'
+  import { ProcessingStates } from '@teachergpt/common/definitions'
   import { formatDate } from '~/utils'
 
   const props = defineProps<{ question: Question }>()
