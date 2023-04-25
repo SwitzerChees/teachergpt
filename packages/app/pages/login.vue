@@ -4,7 +4,7 @@
       <img width="120" src="~/assets/images/logo.png" />
     </div>
     <span class="text-center text-green-300"
-      >TeacherGPT ist eine Lernplattform um Studenten zu ermöglichen, konrkete Fragen über einen Kurs und die rain verwendeten
+      >TeacherGPT ist eine Lernplattform um Studenten zu ermöglichen, konkrete Fragen über einen Kurs und die darin verwendeten
       Kursmaterialien zu stellen.</span
     >
     <h1 class="self-center">Einloggen</h1>
