@@ -1,5 +1,5 @@
 <template>
-  <TabView class="grow panel-full-height">
+  <TabView class="grow panel-full-height" :scrollable="true">
     <TabPanel header="Fragen">
       <OverviewQuestions />
     </TabPanel>

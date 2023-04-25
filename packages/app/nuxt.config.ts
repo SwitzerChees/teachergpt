@@ -24,6 +24,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode', // https://color-mode.nuxtjs.org/
     'nuxt-icon', // https://icones.js.org/
     '@nuxtjs/strapi', // https://strapi.nuxtjs.org/
+    '@nuxtjs/device', // https://device.nuxtjs.org/
   ],
   colorMode: {
     preference: 'system',

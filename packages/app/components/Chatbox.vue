@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-center p-2">
-    <div class="w-2/3 flex flex-col gap-2">
+    <div class="lg:w-2/3 flex flex-col gap-2">
       <span class="self-center text-sm"
         >Stelle eine beliebige Frage über den Inhalt des Kurses und GPT wid versuchen, dir weiterzuhelfen.</span
       >

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-slate-900 w-56 min-w-[14rem] border-r border-gray-700 flex flex-col">
+  <div class="bg-slate-900 w-56 lg:min-w-[14rem] border-r border-gray-700 flex flex-col">
     <NuxtLink
       :to="toLink()"
       class="flex h-16 gap-2 justify-center items-center cursor-pointer hover:bg-slate-800 p-2 transition-colors hover:text-blue-500"
