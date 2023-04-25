@@ -1,6 +1,7 @@
-import { BullStrapi, Course, Lesson, ProcessingStates } from '@teachergpt/common'
+import { Artefact, BullStrapi, Course, Lesson, ProcessingStates } from '@teachergpt/common'
 import { Job } from 'bullmq'
-import { completePrompt } from './openai'
+import { completePrompt, summarySystemMessage } from './openai'
+import { generateArtefactConext, summaryPrompt } from './prompts'
 
 export const processSummaries = (strapi: BullStrapi) => {
   return async (_1: Job) => {
@@ -9,16 +10,19 @@ export const processSummaries = (strapi: BullStrapi) => {
         status: ProcessingStates.Open,
       },
       populate: {
-        artefacts: true,
+        artefacts: {
+          populate: {
+            file: true,
+            pages: true,
+          },
+        },
       },
     })) as Course[]
     for (const openCourse of openCourses) {
       strapi.log.info(`Processing Course: ${openCourse.id}, ${openCourse.name}`)
-      const artefacts = openCourse.artefacts
-      const transcript = artefacts.map((artefact) => artefact.transcript).join(' ')
-      const summaryText = await completePrompt(transcript + '\n Fasse diesen Text zusammen und gib die wichtigsten Erkenntnisse zurück.')
+      const completionText = await artefactsToSummary(openCourse.artefacts)
       await strapi.entityService.update('api::course.course', openCourse.id, {
-        data: { summary: summaryText, status: ProcessingStates.Done },
+        data: { summary: completionText, status: ProcessingStates.Done },
       })
     }
     const openLessons = (await strapi.entityService.findMany('api::lesson.lesson', {
@@ -26,17 +30,27 @@ export const processSummaries = (strapi: BullStrapi) => {
         status: ProcessingStates.Open,
       },
       populate: {
-        artefacts: true,
+        artefacts: {
+          populate: {
+            file: true,
+            pages: true,
+          },
+        },
       },
     })) as Lesson[]
     for (const openLesson of openLessons) {
       strapi.log.info(`Processing Lesson: ${openLesson.id}, ${openLesson.title}`)
-      const artefacts = openLesson.artefacts
-      const transcript = artefacts.map((artefact) => artefact.transcript).join(' ')
-      const summaryText = await completePrompt(transcript + '\n Fasse diesen Text zusammen und gib die wichtigsten Erkenntnisse zurück.')
+      const completionText = await artefactsToSummary(openLesson.artefacts)
       await strapi.entityService.update('api::lesson.lesson', openLesson.id, {
-        data: { summary: summaryText, status: ProcessingStates.Done },
+        data: { summary: completionText, status: ProcessingStates.Done },
       })
+      strapi.log.info(`Lesson: ${openLesson.id}, ${openLesson.title} completed`)
     }
   }
+}
+
+const artefactsToSummary = async (artefacts: Artefact[]) => {
+  const context = generateArtefactConext(artefacts)
+  const prompt = summaryPrompt(context)
+  return await completePrompt(summarySystemMessage, prompt)
 }

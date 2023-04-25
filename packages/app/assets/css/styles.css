@@ -166,3 +166,47 @@ h2 {
   overflow-y: auto;
   flex-grow: 1;
 }
+
+.markdown-format {
+  display: flex;
+  flex-direction: column;
+}
+.markdown-format li {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.markdown-format table {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.markdown-format table th {
+  text-align: left;
+}
+.markdown-format table th,
+.markdown-format table td {
+  padding: 0.5rem;
+  border: 1px solid;
+  border-color: rgb(55 65 81);
+}
+.markdown-format table tr:nth-child(2n) {
+  background-color: rgb(55 65 81);
+}
+.markdown-format {
+  word-break: break-all;
+}
+.markdown-format h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 1rem;
+}
+
+.markdown-format h2 {
+  font-size: 1rem;
+  margin-top: 0.3rem;
+  font-weight: 400;
+}
+
+.markdown-format p {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}

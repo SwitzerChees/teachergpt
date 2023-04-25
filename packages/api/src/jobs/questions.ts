@@ -1,7 +1,7 @@
 import { BullStrapi, Embedding, ProcessingStates, Question } from '@teachergpt/common'
 import { Job } from 'bullmq'
-import { completePrompt, getEmbeddings } from './openai'
-import { generateContext, questionPrompt } from './prompts'
+import { completePrompt, getEmbeddings, questionSystemMessage } from './openai'
+import { generateQuestionContext, questionPrompt } from './prompts'
 
 export const processQuestions = (strapi: BullStrapi) => {
   return async (_1: Job) => {
@@ -54,10 +54,10 @@ export const processQuestions = (strapi: BullStrapi) => {
 
         const top5KEmbeddings = similarityResults.sort((a, b) => b.similarity - a.similarity).slice(0, 5)
         const embeddingDocuments = top5KEmbeddings.map((e) => e.embedding)
-        const context = generateContext(embeddingDocuments)
+        const context = generateQuestionContext(embeddingDocuments)
         const prompt = questionPrompt(context, openQuestion.question)
         strapi.log.info(`Prompt: ${prompt}`)
-        const completionText = await completePrompt(prompt)
+        const completionText = await completePrompt(questionSystemMessage, prompt)
         if (!completionText) continue
         await strapi.entityService.update('api::question.question', openQuestion.id, {
           data: { answer: completionText, status: ProcessingStates.Done },
