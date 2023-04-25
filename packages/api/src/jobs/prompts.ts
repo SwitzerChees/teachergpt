@@ -5,6 +5,9 @@ export const generateSystemMessage = () => {
   VORGABEN:
   - Der KONTEXT soll zur Beantwortung der Frage dienen und hat somit Priorität
   - Priorisiere den Kontext zur Beantwortung der Frage
+  - Ergänze den Kontext in deiner Antwort mit deinem eigenen Wissen
+  - Verwende eine einfache aber fachspezifische Sprache und Formulierungen für deine Antwort
+  - Halte dich in deinen Antworten kurz und prägnant
   - Erwähne den Kontext nicht in deiner Antwort
   - Kennzeichne deine Antwort NICHT als Antwort
   - Formatiere die Antwort mit Markdown wenn nötig, erwähne NIE das Format
