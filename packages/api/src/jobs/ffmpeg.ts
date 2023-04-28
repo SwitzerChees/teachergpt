@@ -1,10 +1,50 @@
-// src/segmentAudio.ts
-
-import { promises as fs } from 'fs'
+import { access, unlink } from 'fs/promises'
 import path from 'path'
-
 import ffmpegPath from 'ffmpeg-static'
 import ffmpeg from 'fluent-ffmpeg'
+
+// Configure ffmpeg to use the provided static path
+ffmpeg.setFfmpegPath(ffmpegPath)
+
+export async function deleteFiles(filePaths: string[]): Promise<void> {
+  for (const filePath of filePaths) {
+    try {
+      await access(filePath)
+      await unlink(filePath)
+      strapi.log.info(`Deleted file: ${filePath}`)
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        strapi.log.info(`File does not exist: ${filePath}`)
+      } else {
+        strapi.log.error(`Error deleting file: ${filePath}`, err)
+      }
+    }
+  }
+}
+
+/**
+ * Converts an M4A file to MP3.
+ * @param inputPath The input M4A file path.
+ * @returns A promise that resolves with the output MP3 file path when the conversion is complete.
+ */
+export function convertM4AtoMP3(inputPath: string): Promise<string> {
+  const inputDir = path.dirname(inputPath)
+  const fileName = path.basename(inputPath, '.m4a')
+  const outputPath = path.join(inputDir, `${fileName}.mp3`)
+
+  return new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+      .outputFormat('mp3')
+      .output(outputPath)
+      .on('end', () => {
+        resolve(outputPath)
+      })
+      .on('error', (error) => {
+        reject(error)
+      })
+      .run()
+  })
+}
 
 type SegmentAudioOptions = {
   inputFile: string
@@ -16,12 +56,12 @@ function timemarkToSeconds(timemark: string): number {
   return parts[0] * 3600 + parts[1] * 60 + parts[2]
 }
 
-async function segmentAudio(options: SegmentAudioOptions): Promise<string[]> {
+export async function segmentAudio(options: SegmentAudioOptions): Promise<string[]> {
   const { inputFile, segmentTimeSeconds } = options
 
   // Check if input file exists
   try {
-    await fs.access(inputFile)
+    await access(inputFile)
   } catch (err) {
     throw new Error('Input file does not exist')
   }
@@ -61,21 +101,3 @@ async function segmentAudio(options: SegmentAudioOptions): Promise<string[]> {
   })
   return segmentPaths
 }
-
-async function deleteFiles(filePaths: string[]): Promise<void> {
-  for (const filePath of filePaths) {
-    try {
-      await fs.access(filePath)
-      await fs.unlink(filePath)
-      strapi.log.info(`Deleted file: ${filePath}`)
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        strapi.log.info(`File does not exist: ${filePath}`)
-      } else {
-        strapi.log.error(`Error deleting file: ${filePath}`, err)
-      }
-    }
-  }
-}
-
-export { segmentAudio, deleteFiles }

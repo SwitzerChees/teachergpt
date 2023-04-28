@@ -2,7 +2,8 @@ import { resolve } from 'path'
 import { Artefact, BullStrapi, ProcessingStates } from '@teachergpt/common'
 import { Job } from 'bullmq'
 import { getTextFromPDF } from './pdf'
-import { getEmbeddings, getTranscript } from './openai'
+import { getEmbeddings } from './openai'
+import { getTranscript } from './whisper'
 
 export const processArtefacts = (strapi: BullStrapi) => {
   return async (_1: Job) => {
@@ -22,14 +23,14 @@ export const processArtefacts = (strapi: BullStrapi) => {
       const filePath = resolve(currentFolder, '..', '..', '..', 'public', 'uploads', `${openArtefact.file.hash}${openArtefact.file.ext}`)
       strapi.log.info(`Processing Artefact: ${openArtefact.id}, ${openArtefact.file.name}`)
       try {
+        for (const existingEmbedding of openArtefact.embeddings) {
+          await strapi.entityService.delete('api::embedding.embedding', existingEmbedding.id)
+        }
+        for (const existingPage of openArtefact.pages) {
+          await strapi.entityService.delete('api::page.page', existingPage.id)
+        }
         if (openArtefact.file.ext === '.pdf') {
           const pages = await getTextFromPDF(filePath)
-          for (const existingPage of openArtefact.pages) {
-            await strapi.entityService.delete('api::page.page', existingPage.id)
-          }
-          for (const existingEmbedding of openArtefact.embeddings) {
-            await strapi.entityService.delete('api::embedding.embedding', existingEmbedding.id)
-          }
           for (const page of pages) {
             const embedding = await getEmbeddings(page.text)
             const newEmbedding = await strapi.entityService.create('api::embedding.embedding', {

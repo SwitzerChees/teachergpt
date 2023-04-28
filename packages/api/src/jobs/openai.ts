@@ -1,7 +1,7 @@
 import { existsSync, createReadStream } from 'fs'
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai'
 import { generateQuestionSystemMessage, generateSummarySystemMessage, transcriptPromt } from './prompts'
-import { deleteFiles, segmentAudio } from './segment-audio'
+import { deleteFiles, segmentAudio } from './ffmpeg'
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 })
