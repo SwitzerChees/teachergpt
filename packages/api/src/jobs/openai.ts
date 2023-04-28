@@ -1,6 +1,7 @@
 import { existsSync, createReadStream } from 'fs'
 import { Configuration, OpenAIApi, ChatCompletionRequestMessage } from 'openai'
-import { generateQuestionSystemMessage, generateSummarySystemMessage } from './prompts'
+import { generateQuestionSystemMessage, generateSummarySystemMessage, transcriptPromt } from './prompts'
+import { deleteFiles, segmentAudio } from './segment-audio'
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -37,18 +38,29 @@ export const completePrompt = async (systemMessage: ChatCompletionRequestMessage
 export const getTranscript = async (path: string) => {
   if (!existsSync(path)) return ''
   try {
+    const audioFilePaths = await segmentAudio({
+      inputFile: path,
+      segmentTimeSeconds: 60,
+    })
     strapi.log.info('Use OpenAI to transcribe audio...')
     const openai = new OpenAIApi(configuration)
-    const audioFile = createReadStream(path)
-    const response = await openai.createTranscription(
-      audioFile, // The audio file to transcribe.
-      process.env.OPENAI_WHISPER_MODEL || 'whisper-1', // The model to use for transcription.
-      undefined, // The prompt to use for transcription.
-      'json', // The format of the transcription.
-      1, // Temperature
-      'de' // Language
-    )
-    return response.data.text
+    let transcript = ''
+    let lastTranscript = transcriptPromt
+    for (const audioFilePath of audioFilePaths) {
+      const audioFile = createReadStream(audioFilePath)
+      const response = await openai.createTranscription(
+        audioFile, // The audio file to transcribe.
+        process.env.OPENAI_WHISPER_MODEL || 'whisper-1', // The model to use for transcription.
+        lastTranscript, // The prompt to use for transcription.
+        'json', // The format of the transcription.
+        0, // Temperature
+        'de' // Language
+      )
+      lastTranscript = response.data.text
+      transcript += lastTranscript
+    }
+    deleteFiles(audioFilePaths)
+    return transcript
   } catch (error) {
     strapi.log.error(error)
     return ''

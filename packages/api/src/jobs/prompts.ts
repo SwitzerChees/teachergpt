@@ -58,6 +58,9 @@ export const summaryPrompt = (context: string) => {
   return messageTemplate
 }
 
+export const transcriptPromt =
+  'This transcript is about a presentation from a teacher in IT topics. He is presenting a presentation and this is the audio transcript of it.'
+
 export const generateQuestionContext = (embeddings: Embedding[]) => {
   let context = ''
   for (const embedding of embeddings) {
