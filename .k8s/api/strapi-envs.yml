@@ -14,6 +14,7 @@ stringData:
   db_ssl: 'false'
   redis_host: ${REDIS_HOST}
   redis_port: '${REDIS_PORT}'
+  whisper_url: ${WHISPER_URL}
   openai_api_key: ${OPENAI_API_KEY}
   openai_gpt_model: ${OPENAI_GPT_MODEL}
   openai_whisper_model: ${OPENAI_WHISPER_MODEL}

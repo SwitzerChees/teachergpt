@@ -85,6 +85,11 @@ spec:
                 secretKeyRef:
                   name: strapi-envs
                   key: redis_port
+            - name: WHISPER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: strapi-envs
+                  key: whisper_url
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
